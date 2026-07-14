@@ -1,64 +1,60 @@
-# 🎈 Elos - Plataforma de Homenagens & Aniversário Dev
+# Elos
 
-**Elos** é uma aplicação web moderna e interativa desenvolvida em Python/Flask para celebrar comemorações e homenagens a desenvolvedores. O projeto combina um design elegante em estilo dark/glassmorphic com recursos dinâmicos, incluindo carrossel de fotos, terminal interativo e mural de recados com curtidas em tempo real.
-
----
-
-## ✨ Funcionalidades Principais
-
-- ** Galeria de Boas-Vindas:** Carrossel horizontal em estilo Instagram para exibição de fotos com ajuste visual personalizável (Natural / Preencher). Suporta estado visual com design para quando não houver fotos.
-- ** Mensagem Especial:** Espaço dedicado para homenagens poéticas e mensagens inspiradoras.
-- ** Terminal Interativo Dev:** Terminal interativo com comandos personalizados e interações sonoras para felicitações no ambiente do desenvolvedor.
-- ** Mural de Recados com Curtidas:** Espaço em carrossel horizontal onde convidados e escritores podem publicar recados de aniversário e curtir em tempo real.
-- ** Gestão de Conteúdo & Permissões:**
-  - **Administrador:** Controle de usuários e gerenciamento completo do sistema.
-  - **Escritor:** Permissão para editar seções da tela e publicar novas homenagens.
-  - **Leitor:** Acesso à navegação e interações de curtida.
+Plataforma web de homenagens e mural de recados de aniversario.
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## Funcionalidades
 
-- **Backend:** Python 3.10+, Flask, Flask-SQLAlchemy, Flask-Login, Flask-Migrate, Flask-WTF
-- **Banco de Dados:** SQLite
-- **Frontend:** HTML5, CSS3 Vanilla (Design System com Glassmorphism & Micro-animações), JavaScript Moderno ES6+ (Módulos)
-- **Audio & Efeitos:** Web Audio API & Canvas Confetti
+- Galeria de Boas-Vindas com carrossel horizontal de fotos
+- Mensagem especial editavel
+- Terminal interativo Dev com comandos personalizados
+- Mural de recados com curtidas em tempo real
+- Sistema de permissoes: Administrador, Escritor, Leitor
 
 ---
 
-## 🚀 Como Executar o Projeto Localmente
+## Tecnologias
 
-### 1. Pré-requisitos
-- Python 3.10 ou superior instalado.
-- Git instalado.
+- Python 3.10+, Flask, Flask-SQLAlchemy, Flask-Login, Flask-Migrate, Flask-WTF
+- SQLite
+- HTML5, CSS3 Vanilla, JavaScript ES6+ (modulos)
 
-### 2. Clonar o Repositório
+---
+
+## Como executar localmente
+
+### 1. Clonar o repositorio
+
 ```bash
-git clone <URL_DO_REPOSITORIO>
+git clone https://github.com/anselmonhamage/elos.git
 cd elos
 ```
 
-### 3. Criar e Ativar o Ambiente Virtual
-No Windows (PowerShell):
+### 2. Criar e ativar o ambiente virtual
+
+Windows:
 ```powershell
 python -m venv venv
 .\venv\Scripts\Activate
 ```
 
-No Linux/macOS:
+Linux/macOS:
 ```bash
 python3 -m venv venv
 source venv/bin/activate
 ```
 
-### 4. Instalar Dependências
+### 3. Instalar dependencias
+
 ```bash
 pip install -r requirements.txt
 ```
-*(Caso não possua o `requirements.txt`, instale via `pip install flask flask-sqlalchemy flask-migrate flask-login flask-wtf python-dotenv`)*
 
-### 5. Configurar Variáveis de Ambiente
+### 4. Configurar variaveis de ambiente
+
 Crie um arquivo `.env` baseado no `.env.example`:
+
 ```env
 SECRET_KEY=sua_chave_secreta_super_segura
 ADMIN_NAME="Administrador Principal"
@@ -66,43 +62,122 @@ ADMIN_EMAIL="admin@dev.com"
 ADMIN_PASSWORD="AdminPass123!"
 ```
 
-### 6. Inicializar a Base de Dados
-Execute o comando CLI para criar as tabelas e o usuário administrador inicial:
+### 5. Correr as migracoes
+
+Na primeira execucao, aplique as migracoes para criar o schema do banco de dados:
+
+```bash
+flask db upgrade
+```
+
+Para criar um novo arquivo de migracao apos alterar os modelos:
+
+```bash
+flask db migrate -m "descricao da alteracao"
+flask db upgrade
+```
+
+### 6. Inicializar dados base (roles e admin)
+
 ```bash
 flask init-db
 ```
 
-### 7. Iniciar o Servidor de Desenvolvimento
+### 7. Iniciar em modo desenvolvimento
+
 ```bash
 python app.py
 ```
-Acesse a aplicação no navegador em: `http://127.0.0.1:5000`
+
+Acesse: `http://127.0.0.1:5000`
 
 ---
 
-## 📁 Estrutura do Projeto
+## Producao com Gunicorn
+
+O projeto inclui o arquivo `wsgi.py` como entrypoint para servidores WSGI.
+
+### Instalacao
+
+O Gunicorn ja esta incluido no `requirements.txt`. Para instalar manualmente:
+
+```bash
+pip install gunicorn
+```
+
+### Executar com Gunicorn
+
+```bash
+gunicorn wsgi:app
+```
+
+### Configuracao recomendada para producao
+
+```bash
+gunicorn wsgi:app \
+  --workers 4 \
+  --bind 0.0.0.0:5000 \
+  --timeout 120 \
+  --access-logfile logs/access.log \
+  --error-logfile logs/error.log
+```
+
+Parametros:
+
+| Parametro | Descricao |
+|---|---|
+| `--workers` | Numero de processos worker. Recomendado: `(2 x num_cpus) + 1` |
+| `--bind` | Endereco e porta de escuta |
+| `--timeout` | Tempo maximo em segundos por request |
+| `--access-logfile` | Ficheiro de log de acessos |
+| `--error-logfile` | Ficheiro de log de erros |
+
+### Executar com um ficheiro de configuracao
+
+Crie um ficheiro `gunicorn.conf.py` na raiz do projeto:
+
+```python
+bind = "0.0.0.0:5000"
+workers = 4
+timeout = 120
+accesslog = "logs/access.log"
+errorlog = "logs/error.log"
+loglevel = "info"
+```
+
+E inicie com:
+
+```bash
+gunicorn -c gunicorn.conf.py wsgi:app
+```
+
+---
+
+## Estrutura do projeto
 
 ```
 elos/
-├── controllers/          # Lógica de controle e rotas (Main, Auth, Writer, Admin, API)
-├── forms/                # Validação de formulários WTForms
-├── models/               # Modelos SQLAlchemy (User, TributeContent, Wish)
-├── static/               # Arquivos estáticos
-│   ├── css/              # Estilos organizados (styles.css)
-│   ├── images/           # Logos e imagens padrão do sistema
-│   ├── js/               # Módulos JavaScript (Carrosséis, Modais, Interações)
-│   └── uploads/          # Diretório de fotos enviadas pelos usuários (Ignorado no Git)
-├── templates/            # Gabaritos HTML Jinja2
-│   ├── components/       # Passos (Step 1 Boas-vindas, Step 2 Mensagem, etc.)
-│   └── modals/           # Modais de login, edição e administração
-├── app.py                # Ponto de entrada da aplicação Flask
-├── LICENSE               # Licença MIT
-├── README.md             # Documentação do projeto
-└── .gitignore            # Regras de ignorados no Git
+├── controllers/          # Logica de controle e rotas
+├── forms/                # Validacao de formularios WTForms
+├── models/               # Modelos SQLAlchemy
+├── static/               # Ficheiros estaticos
+│   ├── css/
+│   ├── images/
+│   ├── js/
+│   └── uploads/          # Fotos enviadas pelos utilizadores (ignorado no Git)
+├── templates/            # Templates HTML Jinja2
+│   ├── components/
+│   └── modals/
+├── app.py                # Ponto de entrada Flask
+├── wsgi.py               # Entrypoint para producao (Gunicorn)
+├── requirements.txt      # Dependencias do projeto
+├── .env.example          # Exemplo de variaveis de ambiente
+├── LICENSE               # Licenca MIT
+└── README.md
 ```
 
 ---
 
-## 📜 Licença
+## Licenca
 
-Este projeto está licenciado sob a Licença **MIT**. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+Licenciado sob a licenca MIT. Consulte o ficheiro [LICENSE](LICENSE) para mais detalhes.
