@@ -1,0 +1,94 @@
+<!-- Passo 4: Mural de Recados e Tela do Escritor -->
+<section class="section-block step-card" data-step="4">
+    <article class="mockup-card full-width-card">
+        
+        <!-- Área reservada de escrita (Escritores / Admin) -->
+        {% if current_user.is_authenticated and current_user.is_writer %}
+            <div class="writer-screen-box">
+                <h2 class="card-title icon-header">
+                    <svg class="header-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                    <span>Escrever Recado de Homenagem</span>
+                </h2>
+                <p class="card-desc">Você possui permissão de Escritor. Escreva uma mensagem carinhosa para ser exibida no mural!</p>
+                
+                <form id="writer-wish-form" class="form-container">
+                    {{ wish_form.hidden_tag() }}
+                    <div class="form-group">
+                        <label for="author">Seu Nome / Apelido</label>
+                        {{ wish_form.author(class="form-control", placeholder="Seu nome", value=current_user.name) }}
+                    </div>
+                    <div class="form-group">
+                        <label for="role">Seu Cargo ou Relação com o Dev</label>
+                        {{ wish_form.role(class="form-control", placeholder="Ex: Desenvolvedor Frontend, Amigo de Infância...") }}
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Sua Mensagem Especial</label>
+                        {{ wish_form.message(class="form-control", rows="3", placeholder="Escreva aqui palavras de carinho e inspiração...") }}
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Publicar Mensagem</button>
+                </form>
+            </div>
+            <hr class="section-divider">
+        {% elif current_user.is_authenticated %}
+            <div class="info-alert-banner">
+                <svg class="alert-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                <p>Sua conta atual é de <strong>Leitor</strong>. A área de escrita é reservada para Escritores convidados. Caso deseje escrever uma mensagem, solicite permissão ao Administrador!</p>
+            </div>
+            <hr class="section-divider">
+        {% else %}
+            <div class="info-alert-banner">
+                <svg class="alert-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <p>Faça <button class="link-btn open-login-trigger">login</button> para visualizar opções de escrita ou interagir com o sistema.</p>
+            </div>
+            <hr class="section-divider">
+        {% endif %}
+
+        <!-- Mural de Recados (Leitura em Scroll Horizontal) -->
+        <div class="mural-header">
+            <div class="mural-header-top">
+                <h2 class="card-title icon-header">
+                    <svg class="header-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
+                    <span>Mural de Recados</span>
+                </h2>
+                <!-- Counter Badge 1/N estilo Instagram -->
+                <div class="mural-counter-badge" id="mural-counter-badge">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <span id="mural-curr-idx">1</span>/<span id="mural-total-idx">{{ wishes|length }}</span>
+                </div>
+            </div>
+            <p class="card-desc">Deslize horizontalmente para navegar por todas as homenagens enviadas!</p>
+        </div>
+
+        <div class="mural-scroll-container">
+            <div id="wishes-list" class="wishes-horizontal-scroll">
+                {% if wishes %}
+                    {% for wish in wishes %}
+                    <div class="wish-scroll-card" data-id="{{ wish.id }}">
+                        <div class="wish-item-header">
+                            <strong>{{ wish.author }}</strong>
+                            <span class="wish-role">({{ wish.role }})</span>
+                            <span class="wish-time">{{ wish.timestamp }}</span>
+                        </div>
+                        <p class="wish-text">{{ wish.message }}</p>
+                        <button class="btn-like-heart {% if wish.is_liked %}liked{% endif %}" id="btn-like-{{ wish.id }}" onclick="likeWish({{ wish.id }}, this)" title="Curtir Homenagem">
+                            <svg class="heart-icon" width="18" height="18" viewBox="0 0 24 24" fill="{% if wish.is_liked %}currentColor{% else %}none{% endif %}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+                            </svg>
+                            <span id="like-num-{{ wish.id }}" class="like-count">{{ wish.likes }}</span>
+                        </button>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p id="no-wishes-msg" class="empty-state">Nenhum recado cadastrado ainda. Seja o primeiro a enviar!</p>
+                {% endif %}
+            </div>
+
+            <button class="insta-arrow-btn prev-arrow" id="mural-prev-arrow" title="Recado Anterior">&larr;</button>
+            <button class="insta-arrow-btn next-arrow" id="mural-next-arrow" title="Próximo Recado">&rarr;</button>
+        </div>
+
+        <div class="step-nav-footer">
+            <button class="btn btn-secondary btn-prev-step">&larr; Voltar</button>
+        </div>
+    </article>
+</section>

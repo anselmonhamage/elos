@@ -1,0 +1,201 @@
+import { soundFx, triggerConfetti } from './sound.js';
+import { getCsrfToken, showToast, escapeHtml } from './utils.js';
+
+export function initWriterSectionEditors() {
+    const editWelcomeForm = document.getElementById('edit-welcome-form');
+    if (editWelcomeForm) {
+        editWelcomeForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = new FormData(editWelcomeForm);
+
+            fetch('/writer/update-welcome', {
+                method: 'POST',
+                headers: { 'X-CSRFToken': getCsrfToken() },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    soundFx.playChime();
+                    showToast(data.message);
+
+                    const titleEl = document.getElementById('welcome-title-display');
+                    const contentEl = document.getElementById('welcome-content-display');
+                    const imgEl = document.getElementById('hero-img-display');
+
+                    if (titleEl) titleEl.textContent = data.title;
+                    if (contentEl) contentEl.textContent = data.content;
+
+                    const track = document.getElementById('welcome-carousel-track');
+                    const emptyGallery = document.getElementById('welcome-empty-gallery');
+                    const counterBadge = document.getElementById('welcome-counter-badge');
+                    const totalIdx = document.getElementById('welcome-total-idx');
+                    const currIdx = document.getElementById('welcome-curr-idx');
+                    const prevBtn = document.getElementById('welcome-prev-arrow');
+                    const nextBtn = document.getElementById('welcome-next-arrow');
+
+                    if (data.images_urls && data.images_urls.length > 0) {
+                        if (emptyGallery) emptyGallery.classList.add('hidden');
+                        if (counterBadge) counterBadge.classList.remove('hidden');
+                        if (track) {
+                            track.classList.remove('hidden');
+                            track.innerHTML = data.images_urls.map(url => `
+                                <div class="insta-carousel-slide">
+                                    <img src="${url}" alt="Foto de Boas-vindas" class="hero-mockup-img welcome-slide-img" style="object-fit: ${data.image_fit || 'contain'};">
+                                </div>
+                            `).join('');
+                        }
+
+                        if (totalIdx) totalIdx.textContent = data.images_urls.length;
+                        if (currIdx) currIdx.textContent = '1';
+
+                        if (prevBtn) prevBtn.style.display = data.images_urls.length > 1 ? 'flex' : 'none';
+                        if (nextBtn) nextBtn.style.display = data.images_urls.length > 1 ? 'flex' : 'none';
+                    } else {
+                        if (track) track.classList.add('hidden');
+                        if (counterBadge) counterBadge.classList.add('hidden');
+                        if (emptyGallery) emptyGallery.classList.remove('hidden');
+                        if (prevBtn) prevBtn.style.display = 'none';
+                        if (nextBtn) nextBtn.style.display = 'none';
+                    }
+
+                    const editWelcomeModal = document.getElementById('edit-welcome-modal');
+                    if (editWelcomeModal) editWelcomeModal.classList.remove('open');
+                } else {
+                    showToast(data.error || 'Erro ao atualizar a seção de boas-vindas.');
+                }
+            });
+        });
+    }
+
+    const editSpecialMsgForm = document.getElementById('edit-special-msg-form');
+    if (editSpecialMsgForm) {
+        editSpecialMsgForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = new FormData(editSpecialMsgForm);
+
+            fetch('/writer/update-special-message', {
+                method: 'POST',
+                headers: { 'X-CSRFToken': getCsrfToken() },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    soundFx.playChime();
+                    showToast(data.message);
+
+                    const titleEl = document.getElementById('special-title-display');
+                    const contentEl = document.getElementById('special-content-display');
+
+                    if (titleEl) titleEl.textContent = data.title;
+                    if (contentEl) {
+                        const paragraphs = data.content.split('\n\n');
+                        contentEl.innerHTML = paragraphs.map((p, idx) => {
+                            return idx === 0 ? `<p class="lead-text">${escapeHtml(p)}</p>` : `<p>${escapeHtml(p)}</p>`;
+                        }).join('');
+                    }
+
+                    const editSpecialMsgModal = document.getElementById('edit-special-msg-modal');
+                    if (editSpecialMsgModal) editSpecialMsgModal.classList.remove('open');
+                } else {
+                    showToast(data.error || 'Erro ao atualizar a mensagem especial.');
+                }
+            });
+        });
+    }
+}
+
+export function initWriterForm() {
+    const writerForm = document.getElementById('writer-wish-form');
+    if (writerForm) {
+        writerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = new FormData(writerForm);
+
+            fetch('/writer/wish', {
+                method: 'POST',
+                headers: { 'X-CSRFToken': getCsrfToken() },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    soundFx.playChime();
+                    triggerConfetti();
+                    showToast('Mensagem publicada no mural com sucesso!');
+                    prependWishHorizontal(data.wish);
+                    writerForm.reset();
+                } else {
+                    showToast(data.error || 'Erro ao publicar mensagem');
+                }
+            });
+        });
+    }
+}
+
+export function prependWishHorizontal(wish) {
+    const list = document.getElementById('wishes-list');
+    if (!list) return;
+
+    const noMsg = document.getElementById('no-wishes-msg');
+    if (noMsg) noMsg.remove();
+
+    const isLiked = wish.is_liked || false;
+    const div = document.createElement('div');
+    div.className = 'wish-scroll-card';
+    div.setAttribute('data-id', wish.id);
+    div.innerHTML = `
+        <div class="wish-item-header">
+            <strong>${escapeHtml(wish.author)}</strong>
+            <span class="wish-role">(${escapeHtml(wish.role)})</span>
+            <span class="wish-time">${escapeHtml(wish.timestamp)}</span>
+        </div>
+        <p class="wish-text">${escapeHtml(wish.message)}</p>
+        <button class="btn-like-heart ${isLiked ? 'liked' : ''}" id="btn-like-${wish.id}" onclick="likeWish(${wish.id}, this)" title="Curtir Homenagem">
+            <svg class="heart-icon" width="18" height="18" viewBox="0 0 24 24" fill="${isLiked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+            </svg>
+            <span id="like-num-${wish.id}" class="like-count">${wish.likes}</span>
+        </button>
+    `;
+    list.prepend(div);
+    list.scrollLeft = 0;
+    if (typeof window.updateMuralCounter === 'function') {
+        window.updateMuralCounter();
+    }
+}
+
+export function likeWish(wishId, btnEl) {
+    const btn = btnEl || document.getElementById(`btn-like-${wishId}`);
+    
+    fetch(`/api/wishes/like/${wishId}`, { 
+        method: 'POST',
+        headers: { 'X-CSRFToken': getCsrfToken() }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            soundFx.playBeep();
+            showToast('Obrigado pelo carinho! Curtida registrada.');
+
+            const numEl = document.getElementById(`like-num-${wishId}`);
+            if (numEl) numEl.textContent = data.likes;
+
+            if (btn) {
+                btn.classList.add('liked');
+                const svg = btn.querySelector('.heart-icon');
+                if (svg) svg.setAttribute('fill', 'currentColor');
+            }
+        } else {
+            showToast(data.error || 'Você já curtiu esta homenagem!');
+            if (btn && data.already_liked) {
+                btn.classList.add('liked');
+                const svg = btn.querySelector('.heart-icon');
+                if (svg) svg.setAttribute('fill', 'currentColor');
+            }
+        }
+    });
+}
+
+window.likeWish = likeWish;

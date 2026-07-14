@@ -1,0 +1,71 @@
+<!-- Modal de Gerenciamento do Admin -->
+{% if current_user.is_authenticated and current_user.is_admin %}
+<div id="admin-modal" class="modal-overlay">
+    <div class="modal-card modal-large">
+        <button class="modal-close" id="close-admin-btn">&times;</button>
+        <h2 class="modal-title icon-header">
+            <svg class="header-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+            <span>Painel do Administrador</span>
+        </h2>
+        <p class="modal-subtitle">Gerencie as permissões de escrita dos usuários e opções de exibição do site</p>
+        
+        <div class="admin-setting-banner">
+            <div class="setting-text">
+                <strong>Terminal Interativo (Passo 3)</strong>
+                <p>Defina se o passo com o terminal interativo deve estar visível para os leitores e visitantes.</p>
+            </div>
+            <button id="toggle-terminal-btn" class="btn btn-sm {% if terminal_enabled %}btn-primary{% else %}btn-outline{% endif %}">
+                <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/></svg>
+                <span id="terminal-toggle-label">{% if terminal_enabled %}Terminal: Visível{% else %}Terminal: Oculto{% endif %}</span>
+            </button>
+        </div>
+        
+        <hr class="section-divider">
+
+        <div class="users-table-container">
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>E-mail</th>
+                        <th>Permissão Atual</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users_list %}
+                    <tr>
+                        <td><strong>{{ user.name }}</strong></td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            {% if user.is_admin %}
+                                <span class="role-pill role-admin">Admin</span>
+                            {% elif user.is_writer %}
+                                <span class="role-pill role-writer" id="user-role-badge-{{ user.id }}">Escritor</span>
+                            {% else %}
+                                <span class="role-pill role-user" id="user-role-badge-{{ user.id }}">Leitor</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if not user.is_admin %}
+                                <button class="btn btn-sm btn-outline toggle-role-btn" 
+                                        data-user-id="{{ user.id }}" 
+                                        id="toggle-btn-{{ user.id }}">
+                                    {% if user.is_writer %}
+                                        Revogar Escritor
+                                    {% else %}
+                                        Tornar Escritor
+                                    {% endif %}
+                                </button>
+                            {% else %}
+                                <span class="text-muted">Master Admin</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}

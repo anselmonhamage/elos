@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Elos - Celebração de Aniversário{% endblock %}
+
+{% block content %}
+    <!-- Indicador de Passos (Wizard Progress Bar) -->
+    {% include 'components/steps_nav.html' %}
+
+    <!-- Passos e Seções da Aplicação -->
+    {% include 'components/step_welcome.html' %}
+    {% include 'components/step_special_msg.html' %}
+    {% include 'components/step_terminal.html' %}
+    {% include 'components/step_mural.html' %}
+{% endblock %}

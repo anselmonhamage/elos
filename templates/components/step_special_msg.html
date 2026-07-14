@@ -1,0 +1,34 @@
+<!-- Passo 2: Mensagem Especial (Editável por Escritores) -->
+<section class="section-block step-card" data-step="2">
+    <article class="mockup-card full-width-card">
+        {% if current_user.is_authenticated and current_user.is_writer %}
+            <div class="card-top-control">
+                <button id="open-edit-special-msg-btn" class="btn btn-sm btn-outline">
+                    <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                    <span>Editar Conteúdo da Mensagem</span>
+                </button>
+            </div>
+        {% endif %}
+
+        <h2 class="card-title" id="special-title-display">{{ special_message_content.title }}</h2>
+        
+        <div class="poetic-content" id="special-content-display">
+            {% for paragraph in special_message_content.content.split('\n\n') %}
+                {% if loop.first %}
+                    <p class="lead-text">{{ paragraph }}</p>
+                {% else %}
+                    <p>{{ paragraph }}</p>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <div class="card-actions">
+            <button id="copy-text-btn" class="btn btn-outline">Copiar Mensagem</button>
+            <button id="hug-btn" class="btn btn-primary">Enviar Abraço Virtual</button>
+        </div>
+        <div class="step-nav-footer">
+            <button class="btn btn-secondary btn-prev-step">&larr; Voltar</button>
+            <button class="btn btn-primary btn-next-step">Próximo &rarr;</button>
+        </div>
+    </article>
+</section>

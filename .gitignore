@@ -1,0 +1,31 @@
+# Uploads de Usuários
+uploads/*
+static/uploads/*
+!static/uploads/.gitkeep
+!uploads/.gitkeep
+
+# Ambientes Virtuais & Pacotes
+venv/
+env/
+ENV/
+.venv/
+
+# Python Bytecode & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Banco de Dados & Instância Local
+instance/*.db
+*.db
+*.sqlite3
+
+# Arquivos de Configuração Sensíveis
+.env
+
+# Configurações de IDE & Sistema Operacional
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

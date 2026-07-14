@@ -1,0 +1,24 @@
+<!-- Indicador de Passos (Step Check Wizard) -->
+<nav class="steps-wizard-nav" aria-label="Navegação por Passos">
+    <div class="steps-progress-track">
+        <div class="steps-progress-bar" id="steps-progress-bar"></div>
+    </div>
+    <div class="steps-list">
+        <button class="step-item active" data-step-target="1">
+            <span class="step-badge">1</span>
+            <span class="step-label">Boas-vindas</span>
+        </button>
+        <button class="step-item" data-step-target="2">
+            <span class="step-badge">2</span>
+            <span class="step-label">Mensagem</span>
+        </button>
+        <button class="step-item {% if not terminal_enabled %}hidden{% endif %}" data-step-target="3" id="step-item-3">
+            <span class="step-badge">3</span>
+            <span class="step-label">Terminal</span>
+        </button>
+        <button class="step-item" data-step-target="4">
+            <span class="step-badge" id="step-badge-4">{{ '3' if not terminal_enabled else '4' }}</span>
+            <span class="step-label">Mural</span>
+        </button>
+    </div>
+</nav>
