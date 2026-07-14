@@ -152,12 +152,24 @@ export function prependWishHorizontal(wish) {
             <span class="wish-time">${escapeHtml(wish.timestamp)}</span>
         </div>
         <p class="wish-text">${escapeHtml(wish.message)}</p>
-        <button class="btn-like-heart ${isLiked ? 'liked' : ''}" id="btn-like-${wish.id}" onclick="likeWish(${wish.id}, this)" title="Curtir Homenagem">
-            <svg class="heart-icon" width="18" height="18" viewBox="0 0 24 24" fill="${isLiked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
-            </svg>
-            <span id="like-num-${wish.id}" class="like-count">${wish.likes}</span>
-        </button>
+        <div class="wish-card-footer">
+            <button class="btn-like-heart ${isLiked ? 'liked' : ''}" id="btn-like-${wish.id}" onclick="likeWish(${wish.id}, this)" title="Curtir Homenagem">
+                <svg class="heart-icon" width="18" height="18" viewBox="0 0 24 24" fill="${isLiked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+                </svg>
+                <span id="like-num-${wish.id}" class="like-count">${wish.likes}</span>
+            </button>
+            <button class="btn-delete-wish" onclick="deleteWish(${wish.id}, this)" title="Excluir Recado">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 6h18"/>
+                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                    <line x1="10" x2="10" y1="11" y2="17"/>
+                    <line x1="14" x2="14" y1="11" y2="17"/>
+                </svg>
+                <span>Excluir</span>
+            </button>
+        </div>
     `;
     list.prepend(div);
     list.scrollLeft = 0;
@@ -198,4 +210,42 @@ export function likeWish(wishId, btnEl) {
     });
 }
 
+export function deleteWish(wishId, btnEl) {
+    if (!confirm('Tem certeza de que deseja excluir este recado do mural?')) {
+        return;
+    }
+
+    fetch(`/writer/wish/delete/${wishId}`, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': getCsrfToken() }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            soundFx.playBeep();
+            showToast(data.message || 'Recado excluído com sucesso!');
+
+            const card = btnEl ? btnEl.closest('.wish-scroll-card') : document.querySelector(`.wish-scroll-card[data-id="${wishId}"]`);
+            if (card) {
+                card.remove();
+            }
+
+            const list = document.getElementById('wishes-list');
+            if (list && list.querySelectorAll('.wish-scroll-card').length === 0) {
+                list.innerHTML = '<p id="no-wishes-msg" class="empty-state">Nenhum recado cadastrado ainda. Seja o primeiro a enviar!</p>';
+            }
+
+            if (typeof window.updateMuralCounter === 'function') {
+                window.updateMuralCounter();
+            }
+        } else {
+            showToast(data.error || 'Erro ao excluir o recado.');
+        }
+    })
+    .catch(() => {
+        showToast('Erro de conexão ao tentar excluir o recado.');
+    });
+}
+
 window.likeWish = likeWish;
+window.deleteWish = deleteWish;

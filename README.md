@@ -153,6 +153,44 @@ gunicorn -c gunicorn.conf.py wsgi:app
 
 ---
 
+## Deploy no Render (Render.com)
+
+O projeto está totalmente preparado para ser implantado no **Render.com** utilizando **PostgreSQL** e **Gunicorn**.
+
+### Opção A: Deploy Automático via Blueprint (Recomendado)
+
+1. Faça login na sua conta do **Render.com**.
+2. Clique em **New +** e selecione **Blueprint**.
+3. Conecte o repositório `https://github.com/anselmonhamage/elos.git`.
+4. O Render detectará automaticamente o arquivo `render.yaml`, configurando:
+   - Um serviço **Web Service** em Python com `gunicorn wsgi:app`
+   - O script `./build.sh` para instalar dependências e executar as migrações do banco (`flask db upgrade` e `flask init-db`)
+   - Um banco de dados **PostgreSQL** nativo conectado pela variável `DATABASE_URL`
+5. Defina as variáveis de ambiente `ADMIN_EMAIL` e `ADMIN_PASSWORD` no painel do Render e clique em **Apply**.
+
+### Opção B: Deploy Manual no Render
+
+1. **Criar Banco PostgreSQL no Render:**
+   - Acesse **New +** > **PostgreSQL**.
+   - Defina o nome `elos-db` e clique em **Create Database**.
+   - Copie a **Internal Database URL**.
+
+2. **Criar Web Service no Render:**
+   - Acesse **New +** > **Web Service**.
+   - Conecte o repositório Git.
+   - **Environment:** `Python 3`
+   - **Build Command:** `./build.sh`
+   - **Start Command:** `gunicorn wsgi:app`
+   - Em **Environment Variables**, adicione:
+     - `DATABASE_URL`: *(Cole a Internal Database URL do PostgreSQL)*
+     - `SECRET_KEY`: *(Gere uma chave aleatória segura)*
+     - `ADMIN_NAME`: `"Administrador Principal"`
+     - `ADMIN_EMAIL`: `"admin@dev.com"`
+     - `ADMIN_PASSWORD`: `"SuaSenhaSegura123!"`
+3. Clique em **Create Web Service**.
+
+---
+
 ## Estrutura do projeto
 
 ```

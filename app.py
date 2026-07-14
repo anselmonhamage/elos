@@ -10,20 +10,26 @@ load_dotenv()
 def create_app():
     app = Flask(__name__, template_folder='templates', static_folder='static')
     
-    db_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'instance', 'birthday.db')
-    os.makedirs(os.path.dirname(db_path), exist_ok=True)
+    database_url = os.environ.get('DATABASE_URL')
+    if database_url:
+        if database_url.startswith("postgres://"):
+            database_url = database_url.replace("postgres://", "postgresql://", 1)
+        app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+    else:
+        db_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'instance', 'birthday.db')
+        os.makedirs(os.path.dirname(db_path), exist_ok=True)
+        app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 
     upload_folder = os.path.join(app.static_folder, 'uploads')
     os.makedirs(upload_folder, exist_ok=True)
-    
+
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'default_secret_key_change_me')
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['UPLOAD_FOLDER'] = upload_folder
     app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
     
     db.init_app(app)
-    migrate.init_app(app, db, render_as_batch=True)
+    migrate.init_app(app, db, render_as_batch=(not database_url))
     login_manager.init_app(app)
     login_manager.login_view = 'main.index'
     csrf.init_app(app)
@@ -100,4 +106,4 @@ def create_app():
 app = create_app()
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=5000, host='0.0.0.0')

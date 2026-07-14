@@ -151,3 +151,19 @@ def create_wish():
 
     errors = [err for field_errors in form.errors.values() for err in field_errors]
     return jsonify({'success': False, 'error': errors[0] if errors else 'Erro na mensagem.'}), 400
+
+@writer_bp.route('/wish/delete/<int:wish_id>', methods=['POST', 'DELETE'])
+@login_required
+def delete_wish(wish_id):
+    wish = Wish.query.get(wish_id)
+    if not wish:
+        return jsonify({'success': False, 'error': 'Recado não encontrado.'}), 404
+
+    # Permissão: Administrador, Escritor ou autor do recado
+    if not (current_user.is_writer or wish.user_id == current_user.id):
+        return jsonify({'success': False, 'error': 'Permissão negada para excluir este recado.'}), 403
+
+    db.session.delete(wish)
+    db.session.commit()
+
+    return jsonify({'success': True, 'message': 'Recado excluído com sucesso!'})
