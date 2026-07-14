@@ -64,16 +64,16 @@ ADMIN_PASSWORD="AdminPass123!"
 
 ### 5. Correr as migracoes
 
-Na primeira execucao, aplique as migracoes para criar o schema do banco de dados:
+Na primeira execucao, inicie as migrações para criar o schema da base de dados:
 
 ```bash
-flask db upgrade
+flask db init
 ```
 
-Para criar um novo arquivo de migracao apos alterar os modelos:
+Para criar um novo arquivo de migração após alterar os modelos:
 
 ```bash
-flask db migrate -m "descricao da alteracao"
+flask db migrate -m "descrição da alteração"
 flask db upgrade
 ```
 
@@ -93,11 +93,11 @@ Acesse: `http://127.0.0.1:5000`
 
 ---
 
-## Producao com Gunicorn
+## Produção com Gunicorn
 
 O projeto inclui o arquivo `wsgi.py` como entrypoint para servidores WSGI.
 
-### Instalacao
+### Instalação
 
 O Gunicorn ja esta incluido no `requirements.txt`. Para instalar manualmente:
 
@@ -111,7 +111,7 @@ pip install gunicorn
 gunicorn wsgi:app
 ```
 
-### Configuracao recomendada para producao
+### Configuração recomendada para produção
 
 ```bash
 gunicorn wsgi:app \
@@ -126,9 +126,9 @@ Parametros:
 
 | Parametro | Descricao |
 |---|---|
-| `--workers` | Numero de processos worker. Recomendado: `(2 x num_cpus) + 1` |
+| `--workers` | Número de processos worker. Recomendado: `(2 x num_cpus) + 1` |
 | `--bind` | Endereco e porta de escuta |
-| `--timeout` | Tempo maximo em segundos por request |
+| `--timeout` | Tempo máximo em segundos por request |
 | `--access-logfile` | Ficheiro de log de acessos |
 | `--error-logfile` | Ficheiro de log de erros |
 
