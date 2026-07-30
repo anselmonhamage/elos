@@ -1583,7 +1583,28 @@ a {
         pointer-events: auto;
     }
 
-    .header-actions, .auth-status-bar {
+    .header-actions {
+        width: auto;
+        justify-content: center;
+        flex-direction: row !important;
+        gap: 12px;
+    }
+
+    .nav-action-text {
+        display: none;
+    }
+
+    .nav-action-btn {
+        width: 38px !important;
+        height: 38px !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .auth-status-bar {
         width: 100%;
         justify-content: center;
     }
