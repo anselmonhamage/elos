@@ -1,4 +1,3 @@
-import base64
 from flask import Blueprint, request, jsonify, redirect, url_for
 from flask_login import login_user, logout_user, login_required, current_user
 from models.database import db
