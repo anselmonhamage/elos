@@ -1668,3 +1668,29 @@ a {
         gap: 10px;
     }
 }
+
+/* Terminal Command Customizer Styles */
+.terminal-cmd-form-row {
+    display: flex;
+    gap: 12px;
+    margin: 16px 0;
+    align-items: center;
+}
+
+.cmd-input-name {
+    width: 25%;
+}
+
+.cmd-input-resp {
+    flex-grow: 1;
+}
+
+.btn-danger {
+    background-color: #ef4444;
+    color: #ffffff;
+    border: none;
+}
+
+.btn-danger:hover {
+    background-color: #dc2626;
+}

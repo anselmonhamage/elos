@@ -58,8 +58,10 @@ def index():
     special_msg_form = SpecialMessageSectionForm(title=special_message_content.title, content=special_message_content.content)
 
     users_list = []
+    terminal_cmds = []
     if current_user.is_authenticated and current_user.is_admin:
         users_list = User.query.order_by(User.created_at.desc()).all()
+        terminal_cmds = TributeContent.query.filter(TributeContent.section_key.like('terminal_cmd_%')).all()
 
     active_step = 1
     if current_user.is_authenticated:
@@ -80,5 +82,6 @@ def index():
         welcome_form=welcome_form,
         special_msg_form=special_msg_form,
         users_list=users_list,
+        terminal_cmds=terminal_cmds,
         active_step=active_step
     )

@@ -66,6 +66,54 @@
                 </tbody>
             </table>
         </div>
+
+        <hr class="section-divider" id="admin-terminal-cmds-section">
+        
+        <div class="terminal-cmds-section">
+            <strong style="font-size: 1.1rem; color: var(--text-primary);">Gerenciar Comandos do Terminal</strong>
+            <p class="modal-subtitle" style="margin-top: 4px; margin-bottom: 16px;">Adicione, edite ou remova comandos personalizados para o terminal interativo.</p>
+            
+            <!-- Form to Add/Edit Commands -->
+            <form id="terminal-cmd-form" class="terminal-cmd-form-row">
+                <input type="text" id="cmd-name-input" placeholder="Comando (ex: doc)" required class="form-input cmd-input-name">
+                <input type="text" id="cmd-resp-input" placeholder="Resposta que o terminal exibirá..." required class="form-input cmd-input-resp">
+                <button type="submit" id="save-cmd-btn" class="btn btn-primary btn-sm">Salvar Comando</button>
+            </form>
+            
+            <div class="users-table-container">
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th>Comando</th>
+                            <th>Resposta / Conteúdo</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="terminal-cmds-table-body">
+                        {% for cmd in terminal_cmds %}
+                        {% set cmd_name = cmd.section_key.replace('terminal_cmd_', '') %}
+                        <tr id="cmd-row-{{ cmd_name }}">
+                            <td><code>{{ cmd_name }}</code></td>
+                            <td><span class="cmd-content-text" id="cmd-text-{{ cmd_name }}">{{ cmd.content }}</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline edit-cmd-btn" 
+                                        data-cmd-name="{{ cmd_name }}" 
+                                        data-cmd-content="{{ cmd.content }}"
+                                        id="edit-cmd-{{ cmd_name }}">
+                                    Editar
+                                </button>
+                                <button class="btn btn-sm btn-danger delete-cmd-btn" 
+                                        data-cmd-name="{{ cmd_name }}"
+                                        id="delete-cmd-{{ cmd_name }}">
+                                    Deletar
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 {% endif %}
