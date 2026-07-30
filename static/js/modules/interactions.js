@@ -3,8 +3,28 @@ import { showToast } from './utils.js';
 
 export function initInteractions() {
     const confettiBtn = document.getElementById('confetti-btn');
+    let confettiClicks = [];
     if (confettiBtn) {
-        confettiBtn.addEventListener('click', triggerConfetti);
+        confettiBtn.addEventListener('click', () => {
+            const now = Date.now();
+            // Filter clicks in the last 6 seconds
+            confettiClicks = confettiClicks.filter(t => now - t < 6000);
+            
+            if (confettiClicks.length >= 3) {
+                showToast('Muitos confetes! Aguarde um momento para soltar mais...');
+                confettiBtn.disabled = true;
+                confettiBtn.classList.add('cooldown-active');
+                
+                setTimeout(() => {
+                    confettiBtn.disabled = false;
+                    confettiBtn.classList.remove('cooldown-active');
+                }, 3000);
+                return;
+            }
+            
+            confettiClicks.push(now);
+            triggerConfetti();
+        });
     }
 
     const audioToggleBtn = document.getElementById('audio-toggle-btn');

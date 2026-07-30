@@ -22,14 +22,24 @@
             <div class="insta-carousel-track {% if images|length == 0 %}hidden{% endif %}" id="welcome-carousel-track">
                 {% for img_fn in images %}
                     <div class="insta-carousel-slide">
-                        <img src="{{ url_for('static', filename='uploads/' ~ img_fn) }}" alt="Foto de Boas-vindas" class="hero-mockup-img welcome-slide-img" style="object-fit: {{ welcome_content.image_fit or 'contain' }};">
+                        {% if img_fn.startswith('http://') or img_fn.startswith('https://') or img_fn.startswith('/') %}
+                            <img src="{{ img_fn }}" alt="Foto de Boas-vindas" class="hero-mockup-img welcome-slide-img" style="object-fit: {{ welcome_content.image_fit or 'contain' }};">
+                        {% elif img_fn.startswith('hero_') %}
+                            <img src="{{ url_for('static', filename='uploads/' ~ img_fn) }}" alt="Foto de Boas-vindas" class="hero-mockup-img welcome-slide-img" style="object-fit: {{ welcome_content.image_fit or 'contain' }};">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='images/' ~ img_fn) }}" alt="Foto de Boas-vindas" class="hero-mockup-img welcome-slide-img" style="object-fit: {{ welcome_content.image_fit or 'contain' }};">
+                        {% endif %}
                     </div>
                 {% endfor %}
             </div>
 
             {% if images|length > 1 %}
-            <button class="insta-arrow-btn prev-arrow" id="welcome-prev-arrow" title="Imagem Anterior">&larr;</button>
-            <button class="insta-arrow-btn next-arrow" id="welcome-next-arrow" title="Próxima Imagem">&rarr;</button>
+            <button class="insta-arrow-btn prev-arrow" id="welcome-prev-arrow" title="Imagem Anterior">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            <button class="insta-arrow-btn next-arrow" id="welcome-next-arrow" title="Próxima Imagem">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
             {% endif %}
 
             <!-- Visual aprimorado quando NÃO tem foto -->
@@ -61,7 +71,10 @@
         </div>
 
         <div class="step-nav-footer">
-            <button class="btn btn-primary btn-next-step">Próximo &rarr;</button>
+            <button class="btn btn-primary btn-next-step">
+                <span>Próximo</span>
+                <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
         </div>
     </article>
 </section>

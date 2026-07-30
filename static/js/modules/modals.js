@@ -47,6 +47,18 @@ export function initModals() {
     if (openLoginBtn && loginModal) openLoginBtn.addEventListener('click', () => loginModal.classList.add('open'));
     if (openRegisterBtn && registerModal) openRegisterBtn.addEventListener('click', () => registerModal.classList.add('open'));
     if (openAdminBtn && adminModal) openAdminBtn.addEventListener('click', () => adminModal.classList.add('open'));
+    const openTerminalCmdsBtn = document.getElementById('open-terminal-cmds-btn');
+    if (openTerminalCmdsBtn && adminModal) {
+        openTerminalCmdsBtn.addEventListener('click', () => {
+            adminModal.classList.add('open');
+            const targetSection = document.getElementById('admin-terminal-cmds-section');
+            if (targetSection) {
+                setTimeout(() => {
+                    targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 180);
+            }
+        });
+    }
     if (openEditWelcomeBtn && editWelcomeModal) openEditWelcomeBtn.addEventListener('click', () => editWelcomeModal.classList.add('open'));
     if (openEditSpecialMsgBtn && editSpecialMsgModal) openEditSpecialMsgBtn.addEventListener('click', () => editSpecialMsgModal.classList.add('open'));
     if (openTermsBtn && termsModal) openTermsBtn.addEventListener('click', () => termsModal.classList.add('open'));
@@ -85,16 +97,5 @@ export function initModals() {
     if (openProfileBtn && profileModal) openProfileBtn.addEventListener('click', () => profileModal.classList.add('open'));
     if (closeProfileBtn && profileModal) closeProfileBtn.addEventListener('click', () => profileModal.classList.remove('open'));
 
-    window.addEventListener('click', (e) => {
-        if (e.target === loginModal) loginModal.classList.remove('open');
-        if (e.target === registerModal) registerModal.classList.remove('open');
-        if (e.target === profileModal) profileModal.classList.remove('open');
-        if (e.target === adminModal) adminModal.classList.remove('open');
-        if (e.target === editWelcomeModal) editWelcomeModal.classList.remove('open');
-        if (e.target === editSpecialMsgModal) editSpecialMsgModal.classList.remove('open');
-        if (e.target === termsModal) termsModal.classList.remove('open');
-        if (e.target === privacyModal) privacyModal.classList.remove('open');
-        if (e.target === supportModal) supportModal.classList.remove('open');
-        if (e.target === faqModal) faqModal.classList.remove('open');
-    });
+
 }

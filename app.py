@@ -7,29 +7,25 @@ from controllers import register_blueprints
 
 load_dotenv()
 
-def create_app():
+def create_app(config_name=None):
     app = Flask(__name__, template_folder='templates', static_folder='static')
     
-    database_url = os.environ.get('DATABASE_URL')
-    if database_url:
-        if database_url.startswith("postgres://"):
-            database_url = database_url.replace("postgres://", "postgresql://", 1)
-        app.config['SQLALCHEMY_DATABASE_URI'] = database_url
-    else:
-        db_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'instance', 'birthday.db')
-        os.makedirs(os.path.dirname(db_path), exist_ok=True)
-        app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
-
-    upload_folder = os.path.join(app.static_folder, 'uploads')
-    os.makedirs(upload_folder, exist_ok=True)
-
-    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'default_secret_key_change_me')
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['UPLOAD_FOLDER'] = upload_folder
-    app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+    if not config_name:
+        config_name = os.environ.get('FLASK_ENV', 'development')
+        
+    from config import config_by_name
+    config_class = config_by_name.get(config_name, config_by_name['development'])
+    config_obj = config_class()
+    app.config.from_object(config_obj)
+    
+    # Ensure uploads folder exists
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     
     db.init_app(app)
-    migrate.init_app(app, db, render_as_batch=(not database_url))
+    
+    is_sqlite = app.config['SQLALCHEMY_DATABASE_URI'].startswith('sqlite')
+    migrate.init_app(app, db, render_as_batch=is_sqlite)
+    
     login_manager.init_app(app)
     login_manager.login_view = 'main.index'
     csrf.init_app(app)
@@ -38,7 +34,7 @@ def create_app():
     
     @login_manager.user_loader
     def load_user(user_id):
-        return User.query.get(int(user_id))
+        return db.session.get(User, int(user_id))
         
     @app.cli.command('init-db')
     def init_db():
@@ -79,6 +75,24 @@ def create_app():
                 title='As Palavras Mais Lindas do Mundo',
                 content=default_poetic
             ))
+        db.session.commit()
+
+        # Seed terminal commands
+        terminal_cmds = {
+            "help": "Comandos disponíveis:\n  - poetry : Lê a mensagem de aniversário para o dev\n  - git log: Exibe o histórico de commits da vida\n  - status : Verifica a saúde do sistema\n  - secret : Ativa o modo de celebração\n  - clear  : Limpa a tela do terminal",
+            "git log": "HEAD -> main: [COMMIT] Adicionado amor, inspiração e conquistas sem limites.",
+            "status": "HTTP 200 OK - Estado mental: Feliz | Memória: Repleta de conquistas | Uptime: 100%",
+            "secret": "Modo de comemoração ativado!"
+        }
+        for cmd_name, cmd_content in terminal_cmds.items():
+            key = f"terminal_cmd_{cmd_name}"
+            existing = TributeContent.query.filter_by(section_key=key).first()
+            if not existing:
+                db.session.add(TributeContent(
+                    section_key=key,
+                    title=f"Terminal Command: {cmd_name}",
+                    content=cmd_content
+                ))
         db.session.commit()
 
         admin_name = os.environ.get("ADMIN_NAME", "Administrador Principal")

@@ -1,4 +1,3 @@
-import base64
 from flask import Blueprint, request, jsonify, redirect, url_for
 from flask_login import login_user, logout_user, login_required, current_user
 from models.database import db
@@ -53,10 +52,10 @@ def update_profile():
 
         if form.profile_image.data:
             file = form.profile_image.data
-            raw_bytes = file.read()
-            mime_type = file.mimetype or 'image/png'
-            b64_encoded = base64.b64encode(raw_bytes).decode('utf-8')
-            current_user.profile_image = f"data:{mime_type};base64,{b64_encoded}"
+            from services.storage_service import get_storage_provider
+            provider = get_storage_provider()
+            url = provider.upload_file(file, unique_prefix="profile_")
+            current_user.profile_image = url
 
         db.session.commit()
         return jsonify({
@@ -72,7 +71,7 @@ def update_profile():
 @auth_bp.route('/profile/delete', methods=['POST'])
 @login_required
 def delete_account():
-    user = current_user
+    user = current_user._get_current_object()
     logout_user()
     db.session.delete(user)
     db.session.commit()

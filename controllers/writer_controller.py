@@ -50,27 +50,27 @@ def update_welcome_section():
                     'error': f"A imagem '{file.filename}' possui {size_mb}MB. Cada foto de boas-vindas deve ter até no máximo 1MB!"
                 }), 400
 
-        saved_names = []
-        for file in valid_files:
-            ext = os.path.splitext(file.filename)[1].lower()
-            unique_name = f"hero_{uuid.uuid4().hex[:10]}{ext}"
-            filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], unique_name)
-            file.save(filepath)
-            saved_names.append(unique_name)
+        from services.storage_service import get_storage_provider
+        provider = get_storage_provider()
 
-        if saved_names:
+        saved_urls = []
+        for file in valid_files:
+            url = provider.upload_file(file, unique_prefix="hero_")
+            saved_urls.append(url)
+
+        if saved_urls:
             if form.append_images.data:
                 existing = sec.get_images_list()
                 combined = []
                 for img in existing:
-                    if img not in combined and img not in saved_names:
+                    if img not in combined and img not in saved_urls:
                         combined.append(img)
-                for img in saved_names:
+                for img in saved_urls:
                     if img not in combined:
                         combined.append(img)
             else:
                 combined = []
-                for img in saved_names:
+                for img in saved_urls:
                     if img not in combined:
                         combined.append(img)
 
@@ -81,7 +81,9 @@ def update_welcome_section():
 
         images_urls = []
         for fn in sec.get_images_list():
-            if os.path.exists(os.path.join(current_app.config['UPLOAD_FOLDER'], fn)):
+            if fn.startswith('http://') or fn.startswith('https://') or fn.startswith('/'):
+                images_urls.append(fn)
+            elif os.path.exists(os.path.join(current_app.config['UPLOAD_FOLDER'], fn)):
                 images_urls.append(url_for('static', filename='uploads/' + fn))
             else:
                 images_urls.append(url_for('static', filename='images/' + fn))
@@ -155,7 +157,7 @@ def create_wish():
 @writer_bp.route('/wish/delete/<int:wish_id>', methods=['POST', 'DELETE'])
 @login_required
 def delete_wish(wish_id):
-    wish = Wish.query.get(wish_id)
+    wish = db.session.get(Wish, wish_id)
     if not wish:
         return jsonify({'success': False, 'error': 'Recado não encontrado.'}), 404
 

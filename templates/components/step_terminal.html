@@ -1,6 +1,14 @@
 <!-- Passo 3: Terminal Interativo -->
 <section class="section-block step-card" data-step="3" id="step-card-3">
     <article class="mockup-card full-width-card">
+        {% if current_user.is_authenticated and current_user.is_admin %}
+            <div class="card-top-control">
+                <button id="open-terminal-cmds-btn" class="btn btn-sm btn-outline">
+                    <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <span>Configurar Comandos do Terminal</span>
+                </button>
+            </div>
+        {% endif %}
         <h2 class="card-title">Terminal Interativo</h2>
         <p class="card-desc">Digite comandos como <code>help</code>, <code>poetry</code>, <code>git log</code>, <code>status</code>, <code>secret</code> ou <code>clear</code>.</p>
         <div class="terminal-box">
@@ -11,8 +19,14 @@
             </div>
         </div>
         <div class="step-nav-footer">
-            <button class="btn btn-secondary btn-prev-step">&larr; Voltar</button>
-            <button class="btn btn-primary btn-next-step">Próximo &rarr;</button>
+            <button class="btn btn-secondary btn-prev-step">
+                <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                <span>Voltar</span>
+            </button>
+            <button class="btn btn-primary btn-next-step">
+                <span>Próximo</span>
+                <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
         </div>
     </article>
 </section>

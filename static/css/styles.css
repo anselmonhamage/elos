@@ -104,20 +104,6 @@ body {
     overflow: hidden;
 }
 
-/* Estado Suspenso (Escondido) quando colapsado */
-.header-nav-expandable.collapsed {
-    max-height: 0;
-    opacity: 0;
-    pointer-events: none;
-    margin-top: 0;
-}
-
-/* Estado Expandido quando ativo */
-.header-nav-expandable.expanded {
-    max-height: 300px;
-    opacity: 1;
-    pointer-events: auto;
-}
 
 .header-actions {
     display: flex;
@@ -198,7 +184,7 @@ body {
 
 /* Botão de Alternância do Menu no Canto Direito */
 .header-toggle-btn {
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     background: #f8fafc;
@@ -348,14 +334,14 @@ body {
 }
 
 .step-item.completed .step-badge {
-    border-color: #00c853;
-    background: #00c853;
+    border-color: #ff758c;
+    background: #ff758c;
     color: #ffffff;
-    box-shadow: 0 0 0 3px rgba(0, 200, 83, 0.15);
+    box-shadow: 0 0 0 3px rgba(255, 117, 140, 0.15);
 }
 
 .step-item.completed .step-label {
-    color: #00c853;
+    color: #ff758c;
 }
 
 /* Transição e Exibição de Passos */
@@ -1583,7 +1569,40 @@ a {
         pointer-events: auto;
     }
 
-    .header-actions, .auth-status-bar {
+    .header-nav-expandable.collapsed {
+        max-height: 0;
+        opacity: 0;
+        margin-top: 0;
+        pointer-events: none;
+    }
+
+    .header-toggle-btn {
+        display: flex;
+    }
+
+    .header-actions {
+        width: auto;
+        justify-content: center;
+        flex-direction: row !important;
+        gap: 12px;
+    }
+
+    .nav-action-text {
+        display: none;
+    }
+
+    .nav-action-btn {
+        width: 38px !important;
+        height: 38px !important;
+        aspect-ratio: 1 / 1 !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    .auth-status-bar {
         width: 100%;
         justify-content: center;
     }
@@ -1666,5 +1685,151 @@ a {
     .form-row-grid {
         flex-direction: column;
         gap: 10px;
+    }
+}
+
+/* Terminal Command Customizer Styles */
+.terminal-cmd-form-container {
+    margin-top: 16px;
+    width: 100%;
+}
+
+.cmd-group-name {
+    width: 25%;
+    min-width: 120px;
+}
+
+.cmd-group-resp {
+    flex: 1;
+    min-width: 0;
+}
+
+.cmd-group-btn {
+    align-self: flex-end;
+}
+
+.btn-save-cmd {
+    height: 44px;
+    padding: 0 24px;
+    white-space: nowrap;
+}
+
+.btn-danger {
+    background-color: #ef4444;
+    color: #ffffff;
+    border: none;
+}
+
+.btn-danger:hover {
+    background-color: #dc2626;
+}
+
+@media (max-width: 600px) {
+    .cmd-group-name {
+        width: 100%;
+    }
+    .cmd-group-btn {
+        width: 100%;
+        align-self: stretch;
+    }
+    .btn-save-cmd {
+        width: 100%;
+    }
+}
+
+/* Table Actions Button Sizing and Spacing */
+.table-actions-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.table-actions-group .btn {
+    padding: 6px 12px;
+    font-size: 0.78rem;
+    height: 32px;
+    line-height: 1;
+    border-radius: 8px;
+    white-space: nowrap;
+}
+
+.actions-column {
+    width: 170px;
+    min-width: 170px;
+}
+
+/* Modal Scrollable Body Layout */
+.modal-body-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 8px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-body-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-body-scroll::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+/* Confetti Button Rate Limit Cooldown Animation */
+.cooldown-active {
+    opacity: 0.6;
+    cursor: not-allowed !important;
+}
+
+.cooldown-active .btn-icon {
+    animation: spin360 1s linear infinite;
+}
+
+@keyframes spin360 {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Prevent modal title and header content from overlapping close button */
+.modal-title, .modal-header {
+    padding-right: 36px;
+}
+
+/* Mobile Command Table Sizing and Wrapping */
+@media (max-width: 600px) {
+    .users-table th, .users-table td {
+        padding: 8px 6px;
+        font-size: 0.8rem;
+    }
+    
+    .cmd-content-text {
+        display: inline-block;
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+    
+    .actions-column {
+        width: 110px !important;
+        min-width: 110px !important;
+    }
+    
+    .table-actions-group {
+        gap: 4px;
+    }
+    
+    .table-actions-group .btn {
+        padding: 4px 6px;
+        font-size: 0.7rem;
+        height: 28px;
+        border-radius: 6px;
     }
 }

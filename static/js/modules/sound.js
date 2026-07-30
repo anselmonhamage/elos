@@ -59,14 +59,14 @@ export function triggerConfetti() {
                 angle: 60,
                 spread: 55,
                 origin: { x: 0 },
-                colors: ['#ff4d8d', '#00c853', '#38bdf8']
+                colors: ['#ff4d8d', '#ff758c', '#38bdf8']
             });
             confetti({
                 particleCount: 5,
                 angle: 120,
                 spread: 55,
                 origin: { x: 1 },
-                colors: ['#ff4d8d', '#00c853', '#38bdf8']
+                colors: ['#ff4d8d', '#ff758c', '#38bdf8']
             });
 
             if (Date.now() < end) {

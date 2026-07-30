@@ -18,43 +18,16 @@ class TributeContent(db.Model):
     updated_by = db.relationship('User')
 
     def get_images_list(self):
-        import os
-        from flask import current_app
+        if self.image_filenames:
+            try:
+                lst = json.loads(self.image_filenames)
+                if isinstance(lst, list) and len(lst) > 0:
+                    return lst
+            except Exception:
+                pass
 
-        valid_exts = ('.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg')
-
-        try:
-            upload_dir = current_app.config.get('UPLOAD_FOLDER')
-            if upload_dir and os.path.exists(upload_dir):
-                all_disk_files = [
-                    f for f in os.listdir(upload_dir)
-                    if f.lower().endswith(valid_exts)
-                ]
-
-                if self.image_filenames:
-                    try:
-                        lst = json.loads(self.image_filenames)
-                        if isinstance(lst, list) and len(lst) > 0:
-                            existing_in_uploads = []
-                            for f in lst:
-                                if f in all_disk_files and f not in existing_in_uploads:
-                                    existing_in_uploads.append(f)
-                            if existing_in_uploads:
-                                return existing_in_uploads
-                    except Exception:
-                        pass
-
-                if self.image_filename and self.image_filename in all_disk_files:
-                    return [self.image_filename]
-
-                if all_disk_files:
-                    result = []
-                    for f in sorted(all_disk_files):
-                        if f not in result:
-                            result.append(f)
-                    return result
-        except Exception:
-            pass
+        if self.image_filename:
+            return [self.image_filename]
 
         return []
 

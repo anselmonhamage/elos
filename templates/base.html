@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 </head>
-<body data-terminal-enabled="{{ 'true' if terminal_enabled else 'false' }}">
+<body data-terminal-enabled="{{ 'true' if terminal_enabled else 'false' }}" data-initial-step="{{ active_step or 1 }}">
     <!-- Cabeçalho Principal -->
     {% include 'components/header.html' %}
 
