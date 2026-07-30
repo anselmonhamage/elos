@@ -1795,3 +1795,41 @@ a {
         transform: rotate(360deg);
     }
 }
+
+/* Prevent modal title and header content from overlapping close button */
+.modal-title, .modal-header {
+    padding-right: 36px;
+}
+
+/* Mobile Command Table Sizing and Wrapping */
+@media (max-width: 600px) {
+    .users-table th, .users-table td {
+        padding: 8px 6px;
+        font-size: 0.8rem;
+    }
+    
+    .cmd-content-text {
+        display: inline-block;
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+    
+    .actions-column {
+        width: 110px !important;
+        min-width: 110px !important;
+    }
+    
+    .table-actions-group {
+        gap: 4px;
+    }
+    
+    .table-actions-group .btn {
+        padding: 4px 6px;
+        font-size: 0.7rem;
+        height: 28px;
+        border-radius: 6px;
+    }
+}

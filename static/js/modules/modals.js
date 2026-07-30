@@ -97,16 +97,5 @@ export function initModals() {
     if (openProfileBtn && profileModal) openProfileBtn.addEventListener('click', () => profileModal.classList.add('open'));
     if (closeProfileBtn && profileModal) closeProfileBtn.addEventListener('click', () => profileModal.classList.remove('open'));
 
-    window.addEventListener('click', (e) => {
-        if (e.target === loginModal) loginModal.classList.remove('open');
-        if (e.target === registerModal) registerModal.classList.remove('open');
-        if (e.target === profileModal) profileModal.classList.remove('open');
-        if (e.target === adminModal) adminModal.classList.remove('open');
-        if (e.target === editWelcomeModal) editWelcomeModal.classList.remove('open');
-        if (e.target === editSpecialMsgModal) editSpecialMsgModal.classList.remove('open');
-        if (e.target === termsModal) termsModal.classList.remove('open');
-        if (e.target === privacyModal) privacyModal.classList.remove('open');
-        if (e.target === supportModal) supportModal.classList.remove('open');
-        if (e.target === faqModal) faqModal.classList.remove('open');
-    });
+
 }
