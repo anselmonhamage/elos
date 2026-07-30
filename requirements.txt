@@ -24,3 +24,4 @@ typing_extensions
 Werkzeug
 WTForms
 pytest
+google-cloud-storage
