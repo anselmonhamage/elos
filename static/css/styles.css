@@ -1597,11 +1597,12 @@ a {
     .nav-action-btn {
         width: 38px !important;
         height: 38px !important;
+        aspect-ratio: 1 / 1 !important;
         padding: 0 !important;
         border-radius: 50% !important;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
     }
 
     .auth-status-bar {
