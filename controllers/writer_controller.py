@@ -35,9 +35,9 @@ def update_welcome_section():
                 uploaded_files = form.images.data if isinstance(form.images.data, list) else [form.images.data]
 
         valid_files = [f for f in uploaded_files if f and f.filename]
-        MAX_SIZE_BYTES = 1 * 1024 * 1024 # 1MB Máximo
+        MAX_SIZE_BYTES = 10 * 1024 * 1024 # 10MB Máximo
 
-        # Validação do Tamanho Máximo de 1MB por Imagem
+        # Validação do Tamanho Máximo de 10MB por Imagem
         for file in valid_files:
             file.seek(0, os.SEEK_END)
             file_size = file.tell()
@@ -47,7 +47,7 @@ def update_welcome_section():
                 size_mb = round(file_size / (1024 * 1024), 2)
                 return jsonify({
                     'success': False,
-                    'error': f"A imagem '{file.filename}' possui {size_mb}MB. Cada foto de boas-vindas deve ter até no máximo 1MB!"
+                    'error': f"A imagem '{file.filename}' possui {size_mb}MB. Cada foto de boas-vindas deve ter até no máximo 10MB!"
                 }), 400
 
         from services.storage_service import get_storage_provider
