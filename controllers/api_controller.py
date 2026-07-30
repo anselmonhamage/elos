@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_login import current_user
 from models.database import db
-from models.models import Wish, WishLike
+from models.models import Wish, WishLike, TributeContent
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
@@ -45,16 +45,36 @@ def handle_terminal():
     req = request.get_json() or {}
     cmd = req.get('command', '').strip().lower()
 
-    responses = {
-        "help": "Comandos disponíveis:\n  - poetry : Lê a mensagem de aniversário para o dev\n  - git log: Exibe o histórico de commits da vida\n  - status : Verifica a saúde do sistema\n  - secret : Ativa o modo de celebração\n  - clear  : Limpa a tela do terminal",
-        "poetry": "Código é lógica, mas você é pura poesia em execução. Feliz aniversário!",
-        "git log": "HEAD -> main: [COMMIT] Adicionado amor, inspiração e conquistas sem limites.",
-        "status": "HTTP 200 OK - Estado mental: Feliz | Memória: Repleta de conquistas | Uptime: 100%",
-        "secret": "Modo de comemoração ativado!"
-    }
-
     if cmd == "clear":
         return jsonify({'success': True, 'response': '', 'clear': True})
 
-    output = responses.get(cmd, f"Comando '{cmd}' não reconhecido. Digite 'help' para listar os comandos.")
+    if cmd == "poetry":
+        # Get poetry from special message section in DB
+        special_sec = TributeContent.query.filter_by(section_key='special_message').first()
+        output = special_sec.content if special_sec else "Código é lógica, mas você é pura poesia em execução. Feliz aniversário!"
+    else:
+        # Check DB for command response
+        cmd_sec = TributeContent.query.filter_by(section_key=f"terminal_cmd_{cmd}").first()
+        if cmd_sec:
+            output = cmd_sec.content
+        else:
+            output = f"Comando '{cmd}' não reconhecido. Digite 'help' para listar os comandos."
+
     return jsonify({'success': True, 'response': output})
+
+@api_bp.route('/steps/active', methods=['POST'])
+def update_active_step():
+    req = request.get_json() or {}
+    step = req.get('step')
+    if not step or not isinstance(step, int) or step < 1 or step > 4:
+        return jsonify({'success': False, 'error': 'Passo inválido.'}), 400
+
+    from flask import session
+    if current_user.is_authenticated:
+        user = current_user._get_current_object()
+        user.active_step = step
+        db.session.commit()
+    else:
+        session['active_step'] = step
+
+    return jsonify({'success': True, 'step': step})

@@ -77,6 +77,24 @@ def create_app(config_name=None):
             ))
         db.session.commit()
 
+        # Seed terminal commands
+        terminal_cmds = {
+            "help": "Comandos disponíveis:\n  - poetry : Lê a mensagem de aniversário para o dev\n  - git log: Exibe o histórico de commits da vida\n  - status : Verifica a saúde do sistema\n  - secret : Ativa o modo de celebração\n  - clear  : Limpa a tela do terminal",
+            "git log": "HEAD -> main: [COMMIT] Adicionado amor, inspiração e conquistas sem limites.",
+            "status": "HTTP 200 OK - Estado mental: Feliz | Memória: Repleta de conquistas | Uptime: 100%",
+            "secret": "Modo de comemoração ativado!"
+        }
+        for cmd_name, cmd_content in terminal_cmds.items():
+            key = f"terminal_cmd_{cmd_name}"
+            existing = TributeContent.query.filter_by(section_key=key).first()
+            if not existing:
+                db.session.add(TributeContent(
+                    section_key=key,
+                    title=f"Terminal Command: {cmd_name}",
+                    content=cmd_content
+                ))
+        db.session.commit()
+
         admin_name = os.environ.get("ADMIN_NAME", "Administrador Principal")
         admin_email = os.environ.get("ADMIN_EMAIL", "admin@dev.com")
         admin_password = os.environ.get("ADMIN_PASSWORD", "AdminPass123!")

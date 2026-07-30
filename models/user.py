@@ -31,6 +31,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
     profile_image = db.Column(db.Text, nullable=True) # Data URL Base64
+    active_step = db.Column(db.Integer, default=1, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     roles = db.relationship('Role', secondary='user_roles', back_populates='users')

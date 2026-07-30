@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, session
 from flask_login import current_user
 from models.models import Wish, User, TributeContent, WishLike
 from forms import LoginForm, RegisterForm, WishForm, WelcomeSectionForm, SpecialMessageSectionForm, ProfileForm
@@ -61,6 +61,12 @@ def index():
     if current_user.is_authenticated and current_user.is_admin:
         users_list = User.query.order_by(User.created_at.desc()).all()
 
+    active_step = 1
+    if current_user.is_authenticated:
+        active_step = current_user.active_step
+    else:
+        active_step = session.get('active_step', 1)
+
     return render_template(
         'index.html',
         wishes=wishes_data,
@@ -73,5 +79,6 @@ def index():
         profile_form=profile_form,
         welcome_form=welcome_form,
         special_msg_form=special_msg_form,
-        users_list=users_list
+        users_list=users_list,
+        active_step=active_step
     )

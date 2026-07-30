@@ -1,4 +1,5 @@
 import { soundFx } from './sound.js';
+import { getCsrfToken } from './utils.js';
 
 export function isTerminalEnabled() {
     const attr = document.body.getAttribute('data-terminal-enabled');
@@ -16,6 +17,12 @@ export function initStepsWizard() {
     const progressBar = document.getElementById('steps-progress-bar');
 
     function getSavedStep() {
+        const bodyStep = document.body.getAttribute('data-initial-step');
+        if (bodyStep) {
+            const parsed = parseInt(bodyStep, 10);
+            if (parsed >= 1 && parsed <= totalSteps) return parsed;
+        }
+
         const hashMatch = window.location.hash.match(/#step-(\d+)/);
         if (hashMatch) {
             const hStep = parseInt(hashMatch[1], 10);
@@ -41,6 +48,16 @@ export function initStepsWizard() {
         }
 
         globalCurrentStep = stepNumber;
+
+        // Persistir no Servidor (Base de dados ou Session)
+        fetch('/api/steps/active', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            },
+            body: JSON.stringify({ step: stepNumber })
+        }).catch(err => console.error('Erro ao salvar passo ativo no servidor:', err));
 
         // Persistir no LocalStorage e URL Hash para manter o passo ao recarregar (F5)
         localStorage.setItem('elos_active_step', stepNumber.toString());

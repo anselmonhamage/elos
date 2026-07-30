@@ -1,5 +1,5 @@
 import json
-from models.models import Wish, WishLike
+from models.models import Wish, WishLike, User
 
 def test_like_wish_authenticated(client, db, create_user):
     user = create_user('User', 'user@example.com', 'password123')
@@ -83,3 +83,32 @@ def test_terminal_api(client):
     data = json.loads(response.data)
     assert data['success'] is True
     assert 'não reconhecido' in data['response']
+
+def test_active_step_api(client, db, create_user):
+    # Test active step update as anonymous guest (should save in session)
+    response = client.post('/api/steps/active', json={'step': 2})
+    assert response.status_code == 200
+    data = json.loads(response.data)
+    assert data['success'] is True
+    assert data['step'] == 2
+
+    # Test active step update as authenticated user (should save in DB)
+    user = create_user('Step User', 'step@example.com', 'password123')
+    client.post('/login', data={
+        'email': 'step@example.com',
+        'password': 'password123'
+    })
+
+    response2 = client.post('/api/steps/active', json={'step': 4})
+    assert response2.status_code == 200
+    data2 = json.loads(response2.data)
+    assert data2['success'] is True
+    assert data2['step'] == 4
+
+    # Verify db
+    updated_user = db.session.get(User, user.id)
+    assert updated_user.active_step == 4
+
+    # Test invalid step validation
+    response3 = client.post('/api/steps/active', json={'step': 99})
+    assert response3.status_code == 400

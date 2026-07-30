@@ -39,7 +39,7 @@ export function initWelcomeCarousel() {
 
         const slideWidth = slides[0].clientWidth || track.clientWidth;
         const scrollPos = track.scrollLeft;
-        const currentIdx = Math.round(scrollPos / slideWidth) + 1;
+        const currentIdx = slideWidth > 0 ? (Math.round(scrollPos / slideWidth) + 1) : 1;
 
         if (currIdxSpan) {
             currIdxSpan.textContent = Math.min(Math.max(currentIdx, 1), slides.length);
@@ -89,7 +89,7 @@ export function initMuralCarousel() {
 
         const cardWidth = list.clientWidth;
         const scrollPos = list.scrollLeft;
-        const currentIdx = Math.round(scrollPos / cardWidth) + 1;
+        const currentIdx = cardWidth > 0 ? (Math.round(scrollPos / cardWidth) + 1) : 1;
 
         if (currIdxSpan) {
             currIdxSpan.textContent = Math.min(Math.max(currentIdx, 1), total);
