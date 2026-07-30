@@ -146,3 +146,33 @@ def test_delete_wish_reader_unauthorized(client, db, create_user):
     data = json.loads(response.data)
     assert data['success'] is False
     assert 'permissão negada' in data['error'].lower()
+
+def test_delete_welcome_image(client, db, create_user):
+    create_user('Writer User', 'writer@example.com', 'password123', 'writer')
+    
+    client.post('/login', data={
+        'email': 'writer@example.com',
+        'password': 'password123'
+    })
+    
+    sec = TributeContent(
+        section_key='welcome',
+        title='Welcome Section',
+        content='Welcome text description...',
+        image_filenames=json.dumps(['hero_image1.jpg', 'hero_image2.jpg']),
+        image_filename='hero_image1.jpg'
+    )
+    db.session.add(sec)
+    db.session.commit()
+    
+    response = client.post('/writer/delete-welcome-image', json={
+        'image_url': 'hero_image1.jpg'
+    })
+    assert response.status_code == 200
+    data = json.loads(response.data)
+    assert data['success'] is True
+    assert 'hero_image1.jpg' not in data['images_urls']
+    
+    db.session.refresh(sec)
+    assert 'hero_image1.jpg' not in sec.get_images_list()
+    assert sec.image_filename == 'hero_image2.jpg'

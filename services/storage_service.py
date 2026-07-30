@@ -7,6 +7,10 @@ class BaseStorageProvider:
         """Uploads a file and returns its public URL or identifier path."""
         raise NotImplementedError
 
+    def delete_file(self, file_url_or_path):
+        """Deletes a file from the storage repository."""
+        raise NotImplementedError
+
 class LocalStorageProvider(BaseStorageProvider):
     def upload_file(self, file, unique_prefix=""):
         ext = os.path.splitext(file.filename)[1].lower()
@@ -16,6 +20,15 @@ class LocalStorageProvider(BaseStorageProvider):
         file.save(filepath)
         # Return web accessible path for local files
         return url_for('static', filename='uploads/' + unique_name)
+
+    def delete_file(self, file_url_or_path):
+        filename = os.path.basename(file_url_or_path)
+        filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+        if os.path.exists(filepath):
+            try:
+                os.remove(filepath)
+            except Exception:
+                pass
 
 class GoogleCloudStorageProvider(BaseStorageProvider):
     def __init__(self, bucket_name):
@@ -47,6 +60,15 @@ class GoogleCloudStorageProvider(BaseStorageProvider):
         
         # Return public URL of the uploaded blob
         return blob.public_url
+
+    def delete_file(self, file_url_or_path):
+        filename = os.path.basename(file_url_or_path)
+        try:
+            bucket = self.client.bucket(self.bucket_name)
+            blob = bucket.blob(filename)
+            blob.delete()
+        except Exception:
+            pass
 
 def get_storage_provider():
     provider_name = current_app.config.get('STORAGE_PROVIDER', 'local').lower()

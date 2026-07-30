@@ -49,6 +49,16 @@ export function initWriterSectionEditors() {
                         if (totalIdx) totalIdx.textContent = data.images_urls.length;
                         if (currIdx) currIdx.textContent = '1';
 
+                        const manageGrid = document.getElementById('welcome-images-manage-grid');
+                        if (manageGrid) {
+                            manageGrid.innerHTML = data.images_urls.map(url => `
+                                <div class="manage-image-card" data-img-url="${url}">
+                                    <img src="${url}" alt="Thumbnail" class="manage-image-thumb">
+                                    <button type="button" class="btn-delete-img" onclick="deleteWelcomeImage('${url}')" title="Excluir Imagem">&times;</button>
+                                </div>
+                            `).join('');
+                        }
+
                         if (prevBtn) prevBtn.style.display = data.images_urls.length > 1 ? 'flex' : 'none';
                         if (nextBtn) nextBtn.style.display = data.images_urls.length > 1 ? 'flex' : 'none';
                     } else {
@@ -249,3 +259,71 @@ export function deleteWish(wishId, btnEl) {
 
 window.likeWish = likeWish;
 window.deleteWish = deleteWish;
+
+window.deleteWelcomeImage = function(imageUrl) {
+    if (!confirm("Deseja realmente excluir esta imagem do carrossel?")) return;
+    
+    fetch('/writer/delete-welcome-image', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: JSON.stringify({ image_url: imageUrl })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            showToast('Imagem excluída do carrossel!');
+            
+            // Remove thumbnail card from the modal view
+            const cards = document.querySelectorAll('.manage-image-card');
+            for (let card of cards) {
+                if (card.getAttribute('data-img-url') === imageUrl) {
+                    card.remove();
+                    break;
+                }
+            }
+            
+            // Update the main page carousels automatically
+            const track = document.getElementById('welcome-carousel-track');
+            const emptyGallery = document.getElementById('welcome-empty-gallery');
+            const counterBadge = document.getElementById('welcome-counter-badge');
+            const totalIdx = document.getElementById('welcome-total-idx');
+            const currIdx = document.getElementById('welcome-curr-idx');
+            const prevBtn = document.getElementById('welcome-prev-arrow');
+            const nextBtn = document.getElementById('welcome-next-arrow');
+
+            if (data.images_urls && data.images_urls.length > 0) {
+                if (emptyGallery) emptyGallery.classList.add('hidden');
+                if (counterBadge) counterBadge.classList.remove('hidden');
+                if (track) {
+                    track.classList.remove('hidden');
+                    track.innerHTML = data.images_urls.map(url => `
+                        <div class="insta-carousel-slide">
+                            <img src="${url}" alt="Foto de Boas-vindas" class="hero-mockup-img welcome-slide-img" style="object-fit: contain;">
+                        </div>
+                    `).join('');
+                }
+
+                if (totalIdx) totalIdx.textContent = data.images_urls.length;
+                if (currIdx) currIdx.textContent = '1';
+
+                if (prevBtn) prevBtn.style.display = data.images_urls.length > 1 ? 'flex' : 'none';
+                if (nextBtn) nextBtn.style.display = data.images_urls.length > 1 ? 'flex' : 'none';
+            } else {
+                if (track) track.classList.add('hidden');
+                if (counterBadge) counterBadge.classList.add('hidden');
+                if (emptyGallery) emptyGallery.classList.remove('hidden');
+                if (prevBtn) prevBtn.style.display = 'none';
+                if (nextBtn) nextBtn.style.display = 'none';
+            }
+        } else {
+            showToast(data.error || 'Erro ao excluir imagem.');
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        showToast('Erro de rede ao excluir imagem.');
+    });
+};

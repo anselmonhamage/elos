@@ -169,3 +169,53 @@ def delete_wish(wish_id):
     db.session.commit()
 
     return jsonify({'success': True, 'message': 'Recado excluído com sucesso!'})
+
+@writer_bp.route('/delete-welcome-image', methods=['POST'])
+@login_required
+def delete_welcome_image():
+    if not current_user.is_writer:
+        return jsonify({'success': False, 'error': 'Permissão negada. Apenas Escritores podem editar esta seção.'}), 403
+
+    data = request.get_json() or {}
+    image_url = data.get('image_url')
+
+    if not image_url:
+        return jsonify({'success': False, 'error': 'Nenhuma imagem informada para exclusão.'}), 400
+
+    sec = TributeContent.query.filter_by(section_key='welcome').first()
+    if not sec:
+        return jsonify({'success': False, 'error': 'Seção de boas-vindas não encontrada.'}), 404
+
+    existing_images = sec.get_images_list()
+    if image_url not in existing_images:
+        return jsonify({'success': False, 'error': 'Imagem não encontrada na galeria.'}), 404
+
+    existing_images.remove(image_url)
+
+    from services.storage_service import get_storage_provider
+    provider = get_storage_provider()
+    
+    if image_url.startswith('http://') or image_url.startswith('https://') or image_url.startswith('/'):
+        try:
+            provider.delete_file(image_url)
+        except Exception:
+            pass
+
+    sec.image_filenames = json.dumps(existing_images)
+    sec.image_filename = existing_images[0] if existing_images else ""
+    db.session.commit()
+
+    images_urls = []
+    for fn in sec.get_images_list():
+        if fn.startswith('http://') or fn.startswith('https://') or fn.startswith('/'):
+            images_urls.append(fn)
+        elif os.path.exists(os.path.join(current_app.config['UPLOAD_FOLDER'], fn)):
+            images_urls.append(url_for('static', filename='uploads/' + fn))
+        else:
+            images_urls.append(url_for('static', filename='images/' + fn))
+
+    return jsonify({
+        'success': True,
+        'images_urls': images_urls,
+        'message': 'Imagem excluída com sucesso!'
+    })

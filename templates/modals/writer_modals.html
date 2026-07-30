@@ -32,6 +32,23 @@
                 {{ welcome_form.images(id="welcome-image-input", class="form-control", multiple=True) }}
                 <small class="form-help">Formatos aceitos: JPG, PNG, WEBP, GIF (até 1MB por imagem)</small>
             </div>
+            <div class="form-group">
+                <label>Fotos Atuais no Carrossel</label>
+                <div class="current-images-grid" id="welcome-images-manage-grid">
+                    {% for img in welcome_content.get_images_list() %}
+                        <div class="manage-image-card" data-img-url="{{ img }}">
+                            {% if img.startswith('http://') or img.startswith('https://') or img.startswith('/') %}
+                                <img src="{{ img }}" alt="Thumbnail" class="manage-image-thumb">
+                            {% elif img.startswith('hero_') %}
+                                <img src="{{ url_for('static', filename='uploads/' ~ img) }}" alt="Thumbnail" class="manage-image-thumb">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='images/' ~ img) }}" alt="Thumbnail" class="manage-image-thumb">
+                            {% endif %}
+                            <button type="button" class="btn-delete-img" onclick="deleteWelcomeImage('{{ img }}')" title="Excluir Imagem">&times;</button>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
             <div class="form-group checkbox-group">
                 {{ welcome_form.append_images(id="append-images-check") }}
                 <label for="append-images-check">Adicionar novas fotos ao carrossel existente</label>
