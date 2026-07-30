@@ -7,7 +7,7 @@ api_bp = Blueprint('api', __name__, url_prefix='/api')
 
 @api_bp.route('/wishes/like/<int:wish_id>', methods=['POST'])
 def like_wish(wish_id):
-    wish = Wish.query.get(wish_id)
+    wish = db.session.get(Wish, wish_id)
     if not wish:
         return jsonify({'success': False, 'error': 'Homenagem não encontrada.'}), 404
 

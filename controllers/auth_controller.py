@@ -72,7 +72,7 @@ def update_profile():
 @auth_bp.route('/profile/delete', methods=['POST'])
 @login_required
 def delete_account():
-    user = current_user
+    user = current_user._get_current_object()
     logout_user()
     db.session.delete(user)
     db.session.commit()

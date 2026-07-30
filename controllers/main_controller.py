@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request
 from flask_login import current_user
-from models.models import Wish, User, TributeContent
+from models.models import Wish, User, TributeContent, WishLike
 from forms import LoginForm, RegisterForm, WishForm, WelcomeSectionForm, SpecialMessageSectionForm, ProfileForm
 from controllers.utils import get_or_create_section
 
@@ -11,7 +11,18 @@ def index():
     wishes = Wish.query.order_by(Wish.timestamp.desc()).all()
     user_id = current_user.id if current_user.is_authenticated else None
     client_ip = request.remote_addr or '127.0.0.1'
-    wishes_data = [w.to_dict(current_user_id=user_id, client_ip=client_ip) for w in wishes]
+    
+    # Pre-fetch liked wishes to solve N+1 query issues
+    liked_wish_ids = set()
+    if wishes:
+        wish_ids = [w.id for w in wishes]
+        if user_id:
+            likes = WishLike.query.filter(WishLike.wish_id.in_(wish_ids), WishLike.user_id == user_id).all()
+        else:
+            likes = WishLike.query.filter(WishLike.wish_id.in_(wish_ids), WishLike.ip_address == client_ip).all()
+        liked_wish_ids = {lk.wish_id for lk in likes}
+
+    wishes_data = [w.to_dict(liked_wish_ids=liked_wish_ids) for w in wishes]
     
     welcome_content = get_or_create_section(
         'welcome',

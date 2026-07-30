@@ -11,7 +11,7 @@ def toggle_writer_role(user_id):
     if not current_user.is_admin:
         return jsonify({'success': False, 'error': 'Acesso negado. Requer perfil de Administrador.'}), 403
 
-    user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
     if not user:
         return jsonify({'success': False, 'error': 'Usuário não encontrado.'}), 404
 

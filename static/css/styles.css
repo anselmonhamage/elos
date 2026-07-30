@@ -348,14 +348,14 @@ body {
 }
 
 .step-item.completed .step-badge {
-    border-color: #00c853;
-    background: #00c853;
+    border-color: #ff758c;
+    background: #ff758c;
     color: #ffffff;
-    box-shadow: 0 0 0 3px rgba(0, 200, 83, 0.15);
+    box-shadow: 0 0 0 3px rgba(255, 117, 140, 0.15);
 }
 
 .step-item.completed .step-label {
-    color: #00c853;
+    color: #ff758c;
 }
 
 /* Transição e Exibição de Passos */

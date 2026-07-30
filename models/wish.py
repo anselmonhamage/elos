@@ -25,12 +25,15 @@ class Wish(db.Model):
     user = db.relationship('User', back_populates='wishes')
     likes_rel = db.relationship('WishLike', backref='wish', lazy='dynamic', cascade='all, delete-orphan')
 
-    def to_dict(self, current_user_id=None, client_ip=None):
-        liked = False
-        if current_user_id:
-            liked = WishLike.query.filter_by(wish_id=self.id, user_id=current_user_id).first() is not None
-        elif client_ip:
-            liked = WishLike.query.filter_by(wish_id=self.id, ip_address=client_ip).first() is not None
+    def to_dict(self, current_user_id=None, client_ip=None, liked_wish_ids=None):
+        if liked_wish_ids is not None:
+            liked = self.id in liked_wish_ids
+        else:
+            liked = False
+            if current_user_id:
+                liked = WishLike.query.filter_by(wish_id=self.id, user_id=current_user_id).first() is not None
+            elif client_ip:
+                liked = WishLike.query.filter_by(wish_id=self.id, ip_address=client_ip).first() is not None
 
         return {
             "id": self.id,

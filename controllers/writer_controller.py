@@ -155,7 +155,7 @@ def create_wish():
 @writer_bp.route('/wish/delete/<int:wish_id>', methods=['POST', 'DELETE'])
 @login_required
 def delete_wish(wish_id):
-    wish = Wish.query.get(wish_id)
+    wish = db.session.get(Wish, wish_id)
     if not wish:
         return jsonify({'success': False, 'error': 'Recado não encontrado.'}), 404
 

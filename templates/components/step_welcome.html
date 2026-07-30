@@ -22,7 +22,11 @@
             <div class="insta-carousel-track {% if images|length == 0 %}hidden{% endif %}" id="welcome-carousel-track">
                 {% for img_fn in images %}
                     <div class="insta-carousel-slide">
-                        <img src="{{ url_for('static', filename='uploads/' ~ img_fn) }}" alt="Foto de Boas-vindas" class="hero-mockup-img welcome-slide-img" style="object-fit: {{ welcome_content.image_fit or 'contain' }};">
+                        {% if img_fn.startswith('hero_') %}
+                            <img src="{{ url_for('static', filename='uploads/' ~ img_fn) }}" alt="Foto de Boas-vindas" class="hero-mockup-img welcome-slide-img" style="object-fit: {{ welcome_content.image_fit or 'contain' }};">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='images/' ~ img_fn) }}" alt="Foto de Boas-vindas" class="hero-mockup-img welcome-slide-img" style="object-fit: {{ welcome_content.image_fit or 'contain' }};">
+                        {% endif %}
                     </div>
                 {% endfor %}
             </div>
