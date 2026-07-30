@@ -104,20 +104,6 @@ body {
     overflow: hidden;
 }
 
-/* Estado Suspenso (Escondido) quando colapsado */
-.header-nav-expandable.collapsed {
-    max-height: 0;
-    opacity: 0;
-    pointer-events: none;
-    margin-top: 0;
-}
-
-/* Estado Expandido quando ativo */
-.header-nav-expandable.expanded {
-    max-height: 300px;
-    opacity: 1;
-    pointer-events: auto;
-}
 
 .header-actions {
     display: flex;
@@ -198,7 +184,7 @@ body {
 
 /* Botão de Alternância do Menu no Canto Direito */
 .header-toggle-btn {
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     background: #f8fafc;
@@ -1581,6 +1567,17 @@ a {
         opacity: 1;
         margin-top: 12px;
         pointer-events: auto;
+    }
+
+    .header-nav-expandable.collapsed {
+        max-height: 0;
+        opacity: 0;
+        margin-top: 0;
+        pointer-events: none;
+    }
+
+    .header-toggle-btn {
+        display: flex;
     }
 
     .header-actions {
