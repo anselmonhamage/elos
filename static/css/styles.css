@@ -1738,3 +1738,22 @@ a {
     width: 170px;
     min-width: 170px;
 }
+
+/* Modal Scrollable Body Layout */
+.modal-body-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 8px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-body-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-body-scroll::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
