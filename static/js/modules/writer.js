@@ -53,8 +53,8 @@ export function initWriterSectionEditors() {
                         if (manageGrid) {
                             manageGrid.innerHTML = data.images_urls.map(url => `
                                 <div class="manage-image-card" data-img-url="${url}">
-                                    <img src="${url}" alt="Thumbnail" class="manage-image-thumb">
-                                    <button type="button" class="btn-delete-img" onclick="deleteWelcomeImage('${url}')" title="Excluir Imagem">&times;</button>
+                                    <img src="${url}" alt="Thumbnail" class="manage-image-thumb" onclick="previewWelcomeImage(this.src)">
+                                    <button type="button" class="btn-delete-img" onclick="deleteWelcomeImage(event, '${url}')" title="Excluir Imagem">&times;</button>
                                 </div>
                             `).join('');
                         }
@@ -260,7 +260,11 @@ export function deleteWish(wishId, btnEl) {
 window.likeWish = likeWish;
 window.deleteWish = deleteWish;
 
-window.deleteWelcomeImage = function(imageUrl) {
+window.deleteWelcomeImage = function(event, imageUrl) {
+    if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
     if (!confirm("Deseja realmente excluir esta imagem do carrossel?")) return;
     
     fetch('/writer/delete-welcome-image', {
@@ -326,4 +330,20 @@ window.deleteWelcomeImage = function(imageUrl) {
         console.error(err);
         showToast('Erro de rede ao excluir imagem.');
     });
+};
+
+window.previewWelcomeImage = function(src) {
+    const overlay = document.getElementById('image-preview-overlay');
+    const content = document.getElementById('image-preview-content');
+    if (overlay && content) {
+        content.src = src;
+        overlay.classList.add('open');
+    }
+};
+
+window.closeImagePreview = function() {
+    const overlay = document.getElementById('image-preview-overlay');
+    if (overlay) {
+        overlay.classList.remove('open');
+    }
 };
