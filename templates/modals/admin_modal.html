@@ -74,10 +74,20 @@
             <p class="modal-subtitle" style="margin-top: 4px; margin-bottom: 16px;">Adicione, edite ou remova comandos personalizados para o terminal interativo.</p>
             
             <!-- Form to Add/Edit Commands -->
-            <form id="terminal-cmd-form" class="terminal-cmd-form-row">
-                <input type="text" id="cmd-name-input" placeholder="Comando (ex: doc)" required class="form-input cmd-input-name">
-                <input type="text" id="cmd-resp-input" placeholder="Resposta que o terminal exibirá..." required class="form-input cmd-input-resp">
-                <button type="submit" id="save-cmd-btn" class="btn btn-primary btn-sm">Salvar Comando</button>
+            <form id="terminal-cmd-form" class="terminal-cmd-form-container">
+                <div class="form-row-grid">
+                    <div class="form-group cmd-group-name">
+                        <label for="cmd-name-input">Comando</label>
+                        <input type="text" id="cmd-name-input" placeholder="ex: site" required class="form-control">
+                    </div>
+                    <div class="form-group cmd-group-resp">
+                        <label for="cmd-resp-input">Resposta / Retorno</label>
+                        <input type="text" id="cmd-resp-input" placeholder="Resposta ou link de retorno..." required class="form-control">
+                    </div>
+                    <div class="form-group cmd-group-btn">
+                        <button type="submit" id="save-cmd-btn" class="btn btn-primary btn-save-cmd">Salvar Comando</button>
+                    </div>
+                </div>
             </form>
             
             <div class="users-table-container">

@@ -1670,19 +1670,29 @@ a {
 }
 
 /* Terminal Command Customizer Styles */
-.terminal-cmd-form-row {
-    display: flex;
-    gap: 12px;
-    margin: 16px 0;
-    align-items: center;
+.terminal-cmd-form-container {
+    margin-top: 16px;
+    width: 100%;
 }
 
-.cmd-input-name {
+.cmd-group-name {
     width: 25%;
+    min-width: 120px;
 }
 
-.cmd-input-resp {
-    flex-grow: 1;
+.cmd-group-resp {
+    flex: 1;
+    min-width: 0;
+}
+
+.cmd-group-btn {
+    align-self: flex-end;
+}
+
+.btn-save-cmd {
+    height: 44px;
+    padding: 0 24px;
+    white-space: nowrap;
 }
 
 .btn-danger {
@@ -1693,4 +1703,17 @@ a {
 
 .btn-danger:hover {
     background-color: #dc2626;
+}
+
+@media (max-width: 600px) {
+    .cmd-group-name {
+        width: 100%;
+    }
+    .cmd-group-btn {
+        width: 100%;
+        align-self: stretch;
+    }
+    .btn-save-cmd {
+        width: 100%;
+    }
 }
