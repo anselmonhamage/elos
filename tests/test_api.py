@@ -112,3 +112,59 @@ def test_active_step_api(client, db, create_user):
     # Test invalid step validation
     response3 = client.post('/api/steps/active', json={'step': 99})
     assert response3.status_code == 400
+
+def test_terminal_admin_commands(client, db, create_user):
+    # Test admin commands as anonymous guest (should fail)
+    response = client.post('/api/terminal', json={'command': 'add testcmd customresponse'})
+    assert response.status_code == 200
+    data = json.loads(response.data)
+    assert 'Apenas administradores' in data['response']
+
+    # Login as admin
+    create_user('Admin', 'admin@dev.com', 'AdminPass123!', role_slug='admin')
+    client.post('/login', data={
+        'email': 'admin@dev.com',
+        'password': 'AdminPass123!'
+    })
+
+    # Test list command
+    response_list = client.post('/api/terminal', json={'command': 'list'})
+    assert response_list.status_code == 200
+    data_list = json.loads(response_list.data)
+    assert 'Comandos de administração disponíveis' in data_list['response']
+
+    # Add command
+    response_add = client.post('/api/terminal', json={'command': 'add testcmd This is a custom test response'})
+    assert response_add.status_code == 200
+    data_add = json.loads(response_add.data)
+    assert 'adicionado com sucesso' in data_add['response']
+
+    # Execute added command
+    response_exec = client.post('/api/terminal', json={'command': 'testcmd'})
+    assert response_exec.status_code == 200
+    data_exec = json.loads(response_exec.data)
+    assert data_exec['response'] == 'This is a custom test response'
+
+    # Edit command
+    response_edit = client.post('/api/terminal', json={'command': 'edit testcmd Modified response!'})
+    assert response_edit.status_code == 200
+    data_edit = json.loads(response_edit.data)
+    assert 'atualizada' in data_edit['response']
+
+    # Execute edited command
+    response_exec2 = client.post('/api/terminal', json={'command': 'testcmd'})
+    assert response_exec2.status_code == 200
+    data_exec2 = json.loads(response_exec2.data)
+    assert data_exec2['response'] == 'Modified response!'
+
+    # Delete command
+    response_del = client.post('/api/terminal', json={'command': 'delete testcmd'})
+    assert response_del.status_code == 200
+    data_del = json.loads(response_del.data)
+    assert 'removido com sucesso' in data_del['response']
+
+    # Execute deleted command (should not recognize)
+    response_exec3 = client.post('/api/terminal', json={'command': 'testcmd'})
+    assert response_exec3.status_code == 200
+    data_exec3 = json.loads(response_exec3.data)
+    assert 'não reconhecido' in data_exec3['response']

@@ -34,7 +34,7 @@ class User(UserMixin, db.Model):
     active_step = db.Column(db.Integer, default=1, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    roles = db.relationship('Role', secondary='user_roles', back_populates='users')
+    roles = db.relationship('Role', secondary='user_roles', back_populates='users', lazy='joined')
     wishes = db.relationship('Wish', back_populates='user', lazy='dynamic')
 
     def set_password(self, password):
