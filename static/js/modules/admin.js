@@ -188,17 +188,19 @@ export function initAdminActions() {
                             <td><code>${name}</code></td>
                             <td><span class="cmd-content-text" id="cmd-text-${name}">${escapeHtml(responseText)}</span></td>
                             <td>
-                                <button class="btn btn-sm btn-outline edit-cmd-btn" 
-                                        data-cmd-name="${name}" 
-                                        data-cmd-content="${escapeHtml(responseText)}"
-                                        id="edit-cmd-${name}">
-                                    Editar
-                                </button>
-                                <button class="btn btn-sm btn-danger delete-cmd-btn" 
-                                        data-cmd-name="${name}"
-                                        id="delete-cmd-${name}">
-                                    Deletar
-                                </button>
+                                <div class="table-actions-group">
+                                    <button class="btn btn-outline edit-cmd-btn" 
+                                            data-cmd-name="${name}" 
+                                            data-cmd-content="${escapeHtml(responseText)}"
+                                            id="edit-cmd-${name}">
+                                        Editar
+                                    </button>
+                                    <button class="btn btn-danger delete-cmd-btn" 
+                                            data-cmd-name="${name}"
+                                            id="delete-cmd-${name}">
+                                        Deletar
+                                    </button>
+                                </div>
                             </td>
                         `;
                         if (tbody) tbody.appendChild(tr);

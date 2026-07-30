@@ -1717,3 +1717,24 @@ a {
         width: 100%;
     }
 }
+
+/* Table Actions Button Sizing and Spacing */
+.table-actions-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.table-actions-group .btn {
+    padding: 6px 12px;
+    font-size: 0.78rem;
+    height: 32px;
+    line-height: 1;
+    border-radius: 8px;
+    white-space: nowrap;
+}
+
+.actions-column {
+    width: 170px;
+    min-width: 170px;
+}

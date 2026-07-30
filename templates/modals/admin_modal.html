@@ -96,7 +96,7 @@
                         <tr>
                             <th>Comando</th>
                             <th>Resposta / Conteúdo</th>
-                            <th>Ações</th>
+                            <th class="actions-column">Ações</th>
                         </tr>
                     </thead>
                     <tbody id="terminal-cmds-table-body">
@@ -106,17 +106,19 @@
                             <td><code>{{ cmd_name }}</code></td>
                             <td><span class="cmd-content-text" id="cmd-text-{{ cmd_name }}">{{ cmd.content }}</span></td>
                             <td>
-                                <button class="btn btn-sm btn-outline edit-cmd-btn" 
-                                        data-cmd-name="{{ cmd_name }}" 
-                                        data-cmd-content="{{ cmd.content }}"
-                                        id="edit-cmd-{{ cmd_name }}">
-                                    Editar
-                                </button>
-                                <button class="btn btn-sm btn-danger delete-cmd-btn" 
-                                        data-cmd-name="{{ cmd_name }}"
-                                        id="delete-cmd-{{ cmd_name }}">
-                                    Deletar
-                                </button>
+                                <div class="table-actions-group">
+                                    <button class="btn btn-outline edit-cmd-btn" 
+                                            data-cmd-name="{{ cmd_name }}" 
+                                            data-cmd-content="{{ cmd.content }}"
+                                            id="edit-cmd-{{ cmd_name }}">
+                                        Editar
+                                    </button>
+                                    <button class="btn btn-danger delete-cmd-btn" 
+                                            data-cmd-name="{{ cmd_name }}"
+                                            id="delete-cmd-{{ cmd_name }}">
+                                        Deletar
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                         {% endfor %}
