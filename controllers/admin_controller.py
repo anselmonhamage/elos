@@ -60,3 +60,26 @@ def toggle_terminal():
         'terminal_enabled': is_enabled,
         'message': msg
     })
+
+@admin_bp.route('/users', methods=['GET'])
+@login_required
+def list_users():
+    if not current_user.is_admin:
+        return jsonify({'success': False, 'error': 'Acesso negado. Requer perfil de Administrador.'}), 403
+
+    users = User.query.order_by(User.created_at.desc()).all()
+    users_data = []
+    for u in users:
+        users_data.append({
+            'id': u.id,
+            'name': u.name,
+            'email': u.email,
+            'is_admin': u.is_admin,
+            'is_writer': u.is_writer
+        })
+
+    return jsonify({
+        'success': True,
+        'users': users_data
+    })
+

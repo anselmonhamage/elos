@@ -1,8 +1,10 @@
 import { soundFx } from './sound.js';
 import { getCsrfToken, showToast, escapeHtml } from './utils.js';
 
-export function initAdminActions() {
-    document.querySelectorAll('.toggle-role-btn').forEach(btn => {
+export function bindUserRoleButtons(container = document) {
+    container.querySelectorAll('.toggle-role-btn').forEach(btn => {
+        if (btn.dataset.bound) return;
+        btn.dataset.bound = 'true';
         btn.addEventListener('click', () => {
             const userId = btn.getAttribute('data-user-id');
             fetch(`/admin/toggle-role/${userId}`, {
@@ -38,6 +40,100 @@ export function initAdminActions() {
             });
         });
     });
+}
+
+export function loadUsersTable() {
+    const tbody = document.getElementById('admin-users-table-body');
+    if (!tbody) return;
+
+    fetch('/admin/users')
+    .then(res => res.json())
+    .then(data => {
+        if (!data.success || !data.users) return;
+
+        if (data.users.length === 0) {
+            tbody.innerHTML = `
+                <tr id="no-users-row">
+                    <td colspan="4" style="text-align: center; color: var(--text-secondary); padding: 20px;">
+                        Nenhum usuário cadastrado.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = data.users.map(u => {
+            let roleBadge = '';
+            if (u.is_admin) {
+                roleBadge = `<span class="role-pill role-admin">Admin</span>`;
+            } else if (u.is_writer) {
+                roleBadge = `<span class="role-pill role-writer" id="user-role-badge-${u.id}">Escritor</span>`;
+            } else {
+                roleBadge = `<span class="role-pill role-user" id="user-role-badge-${u.id}">Leitor</span>`;
+            }
+
+            let actionCol = '';
+            if (!u.is_admin) {
+                const btnText = u.is_writer ? 'Revogar Escritor' : 'Tornar Escritor';
+                actionCol = `
+                    <button class="btn btn-sm btn-outline toggle-role-btn" 
+                            data-user-id="${u.id}" 
+                            id="toggle-btn-${u.id}">
+                        ${btnText}
+                    </button>
+                `;
+            } else {
+                actionCol = `<span class="text-muted">Master Admin</span>`;
+            }
+
+            return `
+                <tr class="user-row" data-user-name="${escapeHtml(u.name.toLowerCase())}" data-user-email="${escapeHtml(u.email.toLowerCase())}">
+                    <td><strong>${escapeHtml(u.name)}</strong></td>
+                    <td>${escapeHtml(u.email)}</td>
+                    <td>${roleBadge}</td>
+                    <td>${actionCol}</td>
+                </tr>
+            `;
+        }).join('');
+
+        bindUserRoleButtons(tbody);
+
+        const searchInput = document.getElementById('user-search-input');
+        if (searchInput && searchInput.value) {
+            searchInput.dispatchEvent(new Event('input'));
+        }
+    })
+    .catch(err => console.error('Erro ao carregar lista de usuários:', err));
+}
+
+export function initAdminActions() {
+    bindUserRoleButtons();
+
+    // User search input live filtering
+    const searchInput = document.getElementById('user-search-input');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            const userRows = document.querySelectorAll('#admin-users-table-body .user-row');
+            let visibleCount = 0;
+
+            userRows.forEach(row => {
+                const name = row.getAttribute('data-user-name') || '';
+                const email = row.getAttribute('data-user-email') || '';
+                if (name.includes(query) || email.includes(query)) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            const noUsersRow = document.getElementById('no-users-row');
+            if (noUsersRow) {
+                noUsersRow.style.display = (visibleCount === 0) ? '' : 'none';
+            }
+        });
+    }
 
     const toggleTerminalBtn = document.getElementById('toggle-terminal-btn');
     if (toggleTerminalBtn) {

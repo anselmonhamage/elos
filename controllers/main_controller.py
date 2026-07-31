@@ -85,3 +85,39 @@ def index():
         terminal_cmds=terminal_cmds,
         active_step=active_step
     )
+
+@main_bp.route('/debug-admin')
+def debug_admin():
+    from flask import jsonify
+    from flask_login import current_user
+    from models.database import db
+    
+    users = User.query.all()
+    users_data = []
+    for u in users:
+        users_data.append({
+            'id': u.id,
+            'name': u.name,
+            'email': u.email,
+            'roles': [r.slug for r in u.roles],
+            'is_admin': u.is_admin,
+            'is_writer': u.is_writer
+        })
+        
+    db_uri = 'Unknown'
+    try:
+        db_uri = str(db.engine.url)
+    except Exception as e:
+        db_uri = f"Error: {str(e)}"
+        
+    return jsonify({
+        'current_user': {
+            'is_authenticated': current_user.is_authenticated,
+            'name': current_user.name if current_user.is_authenticated else None,
+            'email': current_user.email if current_user.is_authenticated else None,
+            'is_admin': current_user.is_admin if current_user.is_authenticated else False,
+        },
+        'all_users_in_db': users_data,
+        'database_uri_used': db_uri
+    })
+

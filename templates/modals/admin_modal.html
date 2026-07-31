@@ -23,49 +23,64 @@
         
         <hr class="section-divider">
 
-        <div class="users-table-container">
-            <table class="users-table">
-                <thead>
-                    <tr>
-                        <th>Nome</th>
-                        <th>E-mail</th>
-                        <th>Permissão Atual</th>
-                        <th>Ação</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for user in users_list %}
-                    <tr>
-                        <td><strong>{{ user.name }}</strong></td>
-                        <td>{{ user.email }}</td>
-                        <td>
-                            {% if user.is_admin %}
-                                <span class="role-pill role-admin">Admin</span>
-                            {% elif user.is_writer %}
-                                <span class="role-pill role-writer" id="user-role-badge-{{ user.id }}">Escritor</span>
-                            {% else %}
-                                <span class="role-pill role-user" id="user-role-badge-{{ user.id }}">Leitor</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if not user.is_admin %}
-                                <button class="btn btn-sm btn-outline toggle-role-btn" 
-                                        data-user-id="{{ user.id }}" 
-                                        id="toggle-btn-{{ user.id }}">
-                                    {% if user.is_writer %}
-                                        Revogar Escritor
-                                    {% else %}
-                                        Tornar Escritor
-                                    {% endif %}
-                                </button>
-                            {% else %}
-                                <span class="text-muted">Master Admin</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <div class="admin-users-section">
+            <strong style="font-size: 1.1rem; color: var(--text-primary);">Atribuição de Permissões de Usuários</strong>
+            <p class="modal-subtitle" style="margin-top: 4px; margin-bottom: 14px;">Conceda permissão de escrita ("Escritor") para permitir que outros usuários publiquem homenagens e mensagens no site.</p>
+
+            <div class="user-search-box" style="margin-bottom: 14px;">
+                <input type="text" id="user-search-input" placeholder="Buscar usuário por nome ou e-mail..." class="form-control" style="max-width: 360px; padding: 8px 12px; font-size: 0.88rem;">
+            </div>
+
+            <div class="users-table-container">
+                <table class="users-table" id="admin-users-table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>E-mail</th>
+                            <th>Permissão Atual</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-users-table-body">
+                        {% for user in users_list %}
+                        <tr class="user-row" data-user-name="{{ user.name | lower }}" data-user-email="{{ user.email | lower }}">
+                            <td><strong>{{ user.name }}</strong></td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                {% if user.is_admin %}
+                                    <span class="role-pill role-admin">Admin</span>
+                                {% elif user.is_writer %}
+                                    <span class="role-pill role-writer" id="user-role-badge-{{ user.id }}">Escritor</span>
+                                {% else %}
+                                    <span class="role-pill role-user" id="user-role-badge-{{ user.id }}">Leitor</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if not user.is_admin %}
+                                    <button class="btn btn-sm btn-outline toggle-role-btn" 
+                                            data-user-id="{{ user.id }}" 
+                                            id="toggle-btn-{{ user.id }}">
+                                        {% if user.is_writer %}
+                                            Revogar Escritor
+                                        {% else %}
+                                            Tornar Escritor
+                                        {% endif %}
+                                    </button>
+                                {% else %}
+                                    <span class="text-muted">Master Admin</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr id="no-users-row">
+                            <td colspan="4" style="text-align: center; color: var(--text-secondary); padding: 20px;">
+                                Nenhum usuário cadastrado.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <hr class="section-divider" id="admin-terminal-cmds-section">

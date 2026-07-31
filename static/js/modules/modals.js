@@ -1,3 +1,5 @@
+import { loadUsersTable } from './admin.js';
+
 export function initModals() {
     const loginModal = document.getElementById('login-modal');
     const registerModal = document.getElementById('register-modal');
@@ -46,11 +48,17 @@ export function initModals() {
 
     if (openLoginBtn && loginModal) openLoginBtn.addEventListener('click', () => loginModal.classList.add('open'));
     if (openRegisterBtn && registerModal) openRegisterBtn.addEventListener('click', () => registerModal.classList.add('open'));
-    if (openAdminBtn && adminModal) openAdminBtn.addEventListener('click', () => adminModal.classList.add('open'));
+    if (openAdminBtn && adminModal) {
+        openAdminBtn.addEventListener('click', () => {
+            adminModal.classList.add('open');
+            loadUsersTable();
+        });
+    }
     const openTerminalCmdsBtn = document.getElementById('open-terminal-cmds-btn');
     if (openTerminalCmdsBtn && adminModal) {
         openTerminalCmdsBtn.addEventListener('click', () => {
             adminModal.classList.add('open');
+            loadUsersTable();
             const targetSection = document.getElementById('admin-terminal-cmds-section');
             if (targetSection) {
                 setTimeout(() => {
