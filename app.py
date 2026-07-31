@@ -41,6 +41,19 @@ def create_app(config_name=None):
         """Inicializa as tabelas da base de dados, papéis, conteúdos padrão e semeia o Admin inicial vindo do .env"""
         db.create_all()
 
+    @app.cli.command('check-users')
+    def check_users():
+        """Lists all users and their roles in the database for debugging."""
+        print("=== DEBUG: LISTA DE USUÁRIOS NO BANCO ===")
+        try:
+            users = User.query.all()
+            print(f"Total de usuários encontrados: {len(users)}")
+            for u in users:
+                roles = [r.slug for r in u.roles]
+                print(f"- ID: {u.id} | Nome: {u.name} | E-mail: {u.email} | Roles: {roles} | is_admin: {u.is_admin}")
+        except Exception as e:
+            print(f"ERRO AO CONSULTAR USUÁRIOS: {e}")
+
         roles_data = [
             {"name": "Administrador", "slug": "admin"},
             {"name": "Escritor", "slug": "writer"},
