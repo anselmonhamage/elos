@@ -34,7 +34,7 @@ def register():
 
         user_role = Role.query.filter_by(slug='user').first()
         if user_role:
-            db.session.add(UserRole(user_id=user.id, role_id=user_role.id))
+            user.roles.append(user_role)
             db.session.commit()
 
         login_user(user)

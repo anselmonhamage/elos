@@ -19,15 +19,13 @@ def toggle_writer_role(user_id):
     if not writer_role:
         return jsonify({'success': False, 'error': 'Papel de escritor não encontrado.'}), 500
 
-    user_role_entry = UserRole.query.filter_by(user_id=user.id, role_id=writer_role.id).first()
-
-    if user_role_entry:
-        db.session.delete(user_role_entry)
+    if writer_role in user.roles:
+        user.roles.remove(writer_role)
         db.session.commit()
         is_writer = False
         msg = f"Permissão de Escritor removida de {user.name}."
     else:
-        db.session.add(UserRole(user_id=user.id, role_id=writer_role.id))
+        user.roles.append(writer_role)
         db.session.commit()
         is_writer = True
         msg = f"Permissão de Escritor concedida a {user.name} com sucesso!"
